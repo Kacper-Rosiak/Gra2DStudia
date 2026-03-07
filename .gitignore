@@ -1,0 +1,48 @@
+# To uchroni przed wrzucaniem niepotrzebnych plików na GitHuba
+
+# Foldery generowane przez Unity (ich zawartość odtwarza się automatycznie)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uilds/
+/[Bb]uild/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+
+# Pliki z cache'm Asset Store
+/[Uu]ser[Ss]ettings/
+
+# Pliki generowane przez środowiska programistyczne (np. Visual Studio, Rider)
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Narzędzia do crashowania i debugowania
+sysinfo.txt
+crash_info.txt
+
+# Pliki systemowe Windows/Mac
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Pliki tymczasowe i backupy
+*.bak
+*.swp
+*~.nib
+local.properties
