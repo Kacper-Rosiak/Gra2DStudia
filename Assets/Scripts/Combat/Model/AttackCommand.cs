@@ -3,11 +3,11 @@ using System;
 
 public class AttackCommand : ICombatCommand
 {
-    private CombatEntity _attacker;
-    private CombatEntity _target;
-    private Action<string> _combatLogCallback; // Event do informowania UI o przebiegu ciosu
+    private Entity _attacker;
+    private Entity _target;
+    private Action<string> _combatLogCallback;
 
-    public AttackCommand(CombatEntity attacker, CombatEntity target, Action<string> logCallback)
+    public AttackCommand(Entity attacker, Entity target, Action<string> logCallback)
     {
         _attacker = attacker;
         _target = target;
@@ -18,14 +18,14 @@ public class AttackCommand : ICombatCommand
     {
         Random rnd = new Random();
 
-        // 1. Logika Uniku (Dodge)
-        if (rnd.Next(0, 100) < _target.DodgeChance)
+        // 1. Logika Uniku (Dodge) - uruchomi siê tylko jeœli DodgeChance > 0
+        if (_target.DodgeChance > 0 && rnd.Next(0, 100) < _target.DodgeChance)
         {
             _combatLogCallback?.Invoke($"{_attacker.Name} atakuje, ale {_target.Name} wykonuje unik!");
-            return; // Przerwanie ciosu
+            return;
         }
 
-        // 2. Logika Obra¿eñ (Zabezpieczenie: cios zadaje minimum 1 pkt obra¿eñ)
+        // 2. Logika Obra¿eñ (Pancerz jest uwzglêdniany tylko tutaj)
         int damage = Math.Max(1, _attacker.Attack - _target.Defense);
 
         // 3. Zaaplikowanie obra¿eñ i wys³anie logu
