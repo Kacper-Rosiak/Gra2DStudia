@@ -1,10 +1,8 @@
 using System;
 using UnityEngine;
 
-
 public class PlayerStats
 {
-
     public event Action<int, int> OnHealthChanged;
     public event Action<int> OnLevelUp;
     public event Action OnDeath;
@@ -14,17 +12,24 @@ public class PlayerStats
     public int Attack { get; private set; }
     public int Defense { get; private set; }
 
+    // Dodane statystyki wymagane przez system walki
+    public int Speed { get; private set; }
+    public int DodgeChance { get; private set; }
+
     public int Level { get; private set; }
     public int CurrentXP { get; private set; }
 
     private int xpToNextLevel;
 
-    public PlayerStats(int hp, int atk, int def)
+    // KONSTRUKTOR Oparty o Data-Driven Design (wzorzec Strategy/Profil klas)
+    public PlayerStats(PlayerClassData classData)
     {
-        MaxHP = hp;
-        CurrentHP = hp;
-        Attack = atk;
-        Defense = def;
+        MaxHP = classData.baseMaxHP;
+        CurrentHP = classData.baseMaxHP;
+        Attack = classData.baseAttack;
+        Defense = classData.baseDefense;
+        Speed = classData.baseSpeed;
+        DodgeChance = classData.baseDodgeChance;
 
         Level = 1;
         CurrentXP = 0;
@@ -34,8 +39,9 @@ public class PlayerStats
 
     public void TakeDamage(int damage)
     {
-        int finalDamage = Math.Max(0, damage - Defense);
-        CurrentHP -= finalDamage;
+        // USUNIÊTO ODEJMOWANIE PANCERZA. 
+        // Obliczenia pancerza (i jego ignorowanie przez magiê) zachodz¹ w logice walki/strategiach.
+        CurrentHP -= damage;
 
         if (CurrentHP <= 0)
         {
@@ -61,11 +67,13 @@ public class PlayerStats
     {
         Level++;
 
+        // Bazowy przyrost statystyk przy awansie na wy¿szy poziom
         MaxHP += 10;
         Attack += 2;
         Defense += 2;
+        // Opcjonalnie mo¿na tu równie¿ zwiêkszaæ Speed: Speed += 1;
 
-        CurrentHP = MaxHP;
+        CurrentHP = MaxHP; // Pe³ne leczenie przy awansie
 
         xpToNextLevel = CalculateXP();
 
@@ -78,4 +86,3 @@ public class PlayerStats
         return 100 + Level * 50;
     }
 }
-
