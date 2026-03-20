@@ -29,7 +29,27 @@ public class CombatManager
     {
         if (CurrentState == BattleState.End) return;
 
-        Entity activeEntity = _initiativeQueue[_currentTurnIndex]; // Zmiana na Entity
+        Entity activeEntity = _initiativeQueue[_currentTurnIndex];
+
+        // Aktywacja efektów na starcie tury (np. obra¿enia z Burn)
+        activeEntity.TriggerTurnStartEffects(log => OnCombatLog?.Invoke(log));
+
+        // Jeœli postaæ umar³a od efektu (np. poparzenia), przejdŸ do podsumowania
+        if (!activeEntity.IsAlive())
+        {
+            ResolveTurn();
+            return;
+        }
+
+        // Obs³uga og³uszenia
+        if (activeEntity.IsStunned)
+        {
+            OnCombatLog?.Invoke($"{activeEntity.Name} jest og³uszony i traci turê!");
+            activeEntity.IsStunned = false; // Resetujemy status po pominiêciu tury
+            ChangeState(BattleState.Resolution);
+            ResolveTurn();
+            return;
+        }
 
         if (activeEntity.IsPlayer)
             ChangeState(BattleState.PlayerTurn);
