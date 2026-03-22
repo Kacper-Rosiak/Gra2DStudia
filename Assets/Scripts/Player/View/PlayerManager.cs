@@ -12,6 +12,7 @@ public class PlayerManager : MonoBehaviour
     public float moveSpeed = 5f;
 
     private Rigidbody2D rb;
+    private Animator anim; // DODANE
     private Vector2 movement;
 
     private bool isInCombat = false;
@@ -76,6 +77,8 @@ public class PlayerManager : MonoBehaviour
                 return new WarriorAbilityStrategy();
             case "Mage":
                 return new MageAbilityStrategy();
+            case "Assassin":
+                return new AssassinAbilityStrategy();
             default:
                 Debug.LogWarning($"Nie znaleziono strategii dla klasy: {className}");
                 return null;
