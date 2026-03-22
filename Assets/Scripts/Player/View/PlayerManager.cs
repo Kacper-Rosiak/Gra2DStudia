@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim; // DODANE
+    private SpriteRenderer spriteRenderer;
     private Vector2 movement;
 
     private bool isInCombat = false;
@@ -20,6 +21,8 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         // 1. Inicjalizacja statystyk na podstawie podpiêtych danych z edytora
         if (startingClass != null)
@@ -59,6 +62,24 @@ public class PlayerManager : MonoBehaviour
 
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        // --- NOWA LOGIKA ODWRACANIA POSTACI ---
+        if (movement.x > 0)
+        {
+            spriteRenderer.flipX = false; // Patrzy w prawo (oryginalny kierunek)
+        }
+        else if (movement.x < 0)
+        {
+            spriteRenderer.flipX = true;  // Odwraca siê w lewo
+        }
+        // --------------------------------------
+
+        if (movement != Vector2.zero)
+        {
+            anim.SetFloat("MoveX", movement.x);
+            anim.SetFloat("MoveY", movement.y);
+        }
+        anim.SetFloat("Speed", movement.sqrMagnitude);
     }
 
     private void FixedUpdate()
