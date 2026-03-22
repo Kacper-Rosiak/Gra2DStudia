@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59b08f2f98b1c0e4c9b2b0c875d927e4, type: 3}
-  m_Name: MageData
+  m_Name: AssasinData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClassData
-  className: Mage
-  baseMaxHP: 70
-  baseAttack: 40
-  baseDefense: 10
-  baseSpeed: 12
-  baseDodgeChance: 10
+  className: Assassin
+  baseMaxHP: 60
+  baseAttack: 12
+  baseDefense: 3
+  baseSpeed: 25
+  baseDodgeChance: 20
