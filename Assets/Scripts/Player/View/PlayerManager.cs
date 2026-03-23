@@ -9,7 +9,7 @@ public class PlayerManager : MonoBehaviour
     public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolnoœæ klasy
 
     [Header("Movement")]
-    public float moveSpeed = 5f;
+    public float moveSpeed = 1f;
 
     private Rigidbody2D rb;
     private Animator anim; // DODANE
