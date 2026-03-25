@@ -8,13 +8,10 @@ public class PlayerManager : MonoBehaviour
     public PlayerStats Stats { get; private set; }
     public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolnoœæ klasy
 
-    [Header("Movement")]
-    public float moveSpeed = 1f;
+    
 
-    private Rigidbody2D rb;
-    private Animator anim; // DODANE
-    private SpriteRenderer spriteRenderer;
-    private Vector2 movement;
+  
+    
 
     private bool isInCombat = false;
 
@@ -62,10 +59,7 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    private void FixedUpdate()
-    {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-    }
+    
 
     // --- NOWE METODY DO OBS£UGI WALK I KLAS ---
 
