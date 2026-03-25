@@ -9,20 +9,21 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
 
     private bool isFacingRight = true;
+    private SpriteRenderer spriteRenderer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
         rb.linearVelocity = moveinput * moveSpeed;
-
-        CheckDirection();
+        FlipSprite();
+        //CheckDirection();
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -39,17 +40,19 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("InputX", moveinput.x);
         animator.SetFloat("InputY", moveinput.y);
     }
-    private void CheckDirection()
+    private void FlipSprite()
     {
-        if(isFacingRight && moveinput.x < 0f || !isFacingRight && moveinput.x > 0f)
+        // Jeœli wartoœæ x jest na minusie (idziemy w lewo), w³¹czamy odwrócenie
+        if (moveinput.x < 0f)
         {
-            isFacingRight = !isFacingRight;
-
-
-            Vector3 localScale = transform.localScale;
-            localScale.x *= -1f;
-            transform.localScale = localScale;
+            spriteRenderer.flipX = true;
         }
+        // Jeœli wartoœæ x jest na plusie (idziemy w prawo), wy³¹czamy odwrócenie
+        else if (moveinput.x > 0f)
+        {
+            spriteRenderer.flipX = false;
+        }
+        // Jeœli moveinput.x wynosi 0 (idziemy tylko w górê/dó³ lub stoimy), 
+        // nie robimy nic – postaæ zostaje odwrócona tak, jak ostatnio.
     }
-
 }

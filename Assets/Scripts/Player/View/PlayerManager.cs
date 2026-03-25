@@ -17,9 +17,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        //rb = GetComponent<Rigidbody2D>();
-        //anim = GetComponent<Animator>();
-        //spriteRenderer = GetComponent<SpriteRenderer>();
+        
 
         // 1. Inicjalizacja statystyk na podstawie podpiêtych danych z edytora
         if (startingClass != null)
