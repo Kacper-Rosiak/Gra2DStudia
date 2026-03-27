@@ -8,21 +8,16 @@ public class PlayerManager : MonoBehaviour
     public PlayerStats Stats { get; private set; }
     public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolnoœæ klasy
 
-    [Header("Movement")]
-    public float moveSpeed = 1f;
+    
 
-    private Rigidbody2D rb;
-    private Animator anim; // DODANE
-    private SpriteRenderer spriteRenderer;
-    private Vector2 movement;
+  
+    
 
     private bool isInCombat = false;
 
     private void Awake()
     {
-        //rb = GetComponent<Rigidbody2D>();
-        //anim = GetComponent<Animator>();
-        //spriteRenderer = GetComponent<SpriteRenderer>();
+        
 
         // 1. Inicjalizacja statystyk na podstawie podpiêtych danych z edytora
         if (startingClass != null)
@@ -62,10 +57,7 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    private void FixedUpdate()
-    {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-    }
+    
 
     // --- NOWE METODY DO OBS£UGI WALK I KLAS ---
 

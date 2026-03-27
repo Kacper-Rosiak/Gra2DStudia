@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9b1accab5fdbcf4491b53b05f573803, type: 3}
-  m_Name: Goblin 1
+  m_Name: Orc Shaman
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyId: Skeleton
-  maxHP: 40
-  attack: 8
-  defense: 4
-  speed: 5
-  xpReward: 15
+  enemyId: Orc Shaman
+  maxHP: 35
+  attack: 17
+  defense: 2
+  speed: 10
+  xpReward: 35

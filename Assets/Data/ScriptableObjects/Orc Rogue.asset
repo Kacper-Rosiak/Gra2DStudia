@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9b1accab5fdbcf4491b53b05f573803, type: 3}
-  m_Name: Fat Gobllin
+  m_Name: Orc Rogue
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyId: Fat Goblin
-  maxHP: 120
+  enemyId: Orc Rogue
+  maxHP: 40
   attack: 8
-  defense: 6
-  speed: 1
-  xpReward: 25
+  defense: 4
+  speed: 5
+  xpReward: 15
