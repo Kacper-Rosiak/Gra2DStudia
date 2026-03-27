@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9b1accab5fdbcf4491b53b05f573803, type: 3}
-  m_Name: Goblin
+  m_Name: Skleton Warrior
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyId: Goblin
-  maxHP: 30
-  attack: 6
-  defense: 2
-  speed: 8
-  xpReward: 10
+  enemyId: Skleton Warrior
+  maxHP: 15
+  attack: 2
+  defense: 0
+  speed: 10
+  xpReward: 15
