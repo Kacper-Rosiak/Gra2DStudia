@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    [Header("Player Identity")]
+    public string playerName = "Bohater";
+
     [Header("Player Profile (Data-Driven)")]
     public PlayerClassData startingClass; // <--- DODANE: Referencja do danych z edytora Unity
 
     public PlayerStats Stats { get; private set; }
-    public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolnoœæ klasy
+    public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolnoï¿½ï¿½ klasy
 
     
 
@@ -19,7 +22,7 @@ public class PlayerManager : MonoBehaviour
     {
         
 
-        // 1. Inicjalizacja statystyk na podstawie podpiêtych danych z edytora
+        // 1. Inicjalizacja statystyk na podstawie podpiï¿½tych danych z edytora
         if (startingClass != null)
         {
             Stats = new PlayerStats(startingClass);
@@ -27,7 +30,7 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Brak przypisanej klasy postaci w PlayerManager! Przeci¹gnij PlayerClassData do Inspektora.");
+            Debug.LogError("Brak przypisanej klasy postaci w PlayerManager! Przeciï¿½gnij PlayerClassData do Inspektora.");
         }
     }
 
@@ -59,9 +62,9 @@ public class PlayerManager : MonoBehaviour
 
     
 
-    // --- NOWE METODY DO OBS£UGI WALK I KLAS ---
+    // --- NOWE METODY DO OBSï¿½UGI WALK I KLAS ---
 
-    // Funkcja fabrykuj¹ca (Factory Method) - przypisuje strategiê do nazwy klasy
+    // Funkcja fabrykujï¿½ca (Factory Method) - przypisuje strategiï¿½ do nazwy klasy
     private IAbilityStrategy CreateStrategyForClass(string className)
     {
         switch (className)
@@ -78,7 +81,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // Zwraca obiekt gracza przygotowany do walki, wstrzykuj¹c mu statystyki i strategiê
+    // Zwraca obiekt gracza przygotowany do walki, wstrzykujï¿½c mu statystyki i strategiï¿½
     public Player GetCombatEntity(string playerName)
     {
         return new Player(playerName, Stats, CurrentAbility);
