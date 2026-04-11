@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: WarriorData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClassData
   className: Warrior
+  classIcon: {fileID: -1530703239152499283, guid: 4795722138bcf1b438303b8233e142de, type: 3}
   baseMaxHP: 150
   baseAttack: 15
   baseDefense: 35
