@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerClassData : ScriptableObject
 {
     public string className;
+    public Sprite classIcon;
 
     [Header("Base Stats")]
     public int baseMaxHP;
