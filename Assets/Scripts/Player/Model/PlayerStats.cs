@@ -8,11 +8,22 @@ public class PlayerStats
     public event Action OnDeath;
 
     public int CurrentHP { get; private set; }
-    public int MaxHP { get; private set; }
-    public int Attack { get; private set; }
-    public int Defense { get; private set; }
+    
+    // Base stats (from level/class)
+    private int _baseMaxHP;
+    private int _baseAttack;
+    private int _baseDefense;
 
-    // Dodane statystyki wymagane przez system walki
+    // Bonus stats (from equipment)
+    private int _bonusMaxHP;
+    private int _bonusAttack;
+    private int _bonusDefense;
+
+    // Calculated properties
+    public int MaxHP => _baseMaxHP + _bonusMaxHP;
+    public int Attack => _baseAttack + _bonusAttack;
+    public int Defense => _baseDefense + _bonusDefense;
+
     public int Speed { get; private set; }
     public int DodgeChance { get; private set; }
 
@@ -21,13 +32,12 @@ public class PlayerStats
 
     private int xpToNextLevel;
 
-    // KONSTRUKTOR Oparty o Data-Driven Design (wzorzec Strategy/Profil klas)
     public PlayerStats(PlayerClassData classData)
     {
-        MaxHP = classData.baseMaxHP;
-        CurrentHP = classData.baseMaxHP;
-        Attack = classData.baseAttack;
-        Defense = classData.baseDefense;
+        _baseMaxHP = classData.baseMaxHP;
+        CurrentHP = _baseMaxHP;
+        _baseAttack = classData.baseAttack;
+        _baseDefense = classData.baseDefense;
         Speed = classData.baseSpeed;
         DodgeChance = classData.baseDodgeChance;
 
@@ -37,10 +47,29 @@ public class PlayerStats
         xpToNextLevel = CalculateXP();
     }
 
+    public void UpdateEquipmentBonuses(int attack, int defense, int maxHP)
+    {
+        _bonusAttack = attack;
+        _bonusDefense = defense;
+        _bonusMaxHP = maxHP;
+        
+        // Ensure HP doesn't exceed new MaxHP, but keep it at its current value if it's lower
+        if (CurrentHP > MaxHP) CurrentHP = MaxHP;
+        
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+    }
+
+    public void Heal(int amount)
+    {
+        CurrentHP += amount;
+        if (CurrentHP > MaxHP) CurrentHP = MaxHP;
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+    }
+
     public void TakeDamage(int damage)
     {
-        // USUNIÊTO ODEJMOWANIE PANCERZA. 
-        // Obliczenia pancerza (i jego ignorowanie przez magiê) zachodz¹ w logice walki/strategiach.
+        // USUNIï¿½TO ODEJMOWANIE PANCERZA. 
+        // Obliczenia pancerza (i jego ignorowanie przez magiï¿½) zachodzï¿½ w logice walki/strategiach.
         CurrentHP -= damage;
 
         if (CurrentHP <= 0)
@@ -67,19 +96,20 @@ public class PlayerStats
     {
         Level++;
 
-        // Bazowy przyrost statystyk przy awansie na wy¿szy poziom
-        MaxHP += 10;
-        Attack += 2;
-        Defense += 2;
-        // Opcjonalnie mo¿na tu równie¿ zwiêkszaæ Speed: Speed += 1;
+        // Bazowy przyrost statystyk przy awansie na wyszy poziom
+        _baseMaxHP += 10;
+        _baseAttack += 2;
+        _baseDefense += 2;
+        // Opcjonalnie mona tu rwnie zwiksza Speed: Speed += 1;
 
-        CurrentHP = MaxHP; // Pe³ne leczenie przy awansie
+        CurrentHP = MaxHP; // Pe ne leczenie przy awansie
 
         xpToNextLevel = CalculateXP();
 
         OnLevelUp?.Invoke(Level);
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
     }
+
 
     private int CalculateXP()
     {

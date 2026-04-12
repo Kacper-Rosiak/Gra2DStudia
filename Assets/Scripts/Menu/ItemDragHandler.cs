@@ -41,19 +41,23 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         if (dropSlot != null)
         {
-            if(dropSlot.currentItem != null)
+            // Simple visual move for now, logic will be handled by InventoryController
+            if(dropSlot.currentItemVisual != null)
             {
-                dropSlot.currentItem.transform.SetParent(originalSlot.transform);
-                originalSlot.currentItem = dropSlot.currentItem;
-                dropSlot.currentItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                dropSlot.currentItemVisual.transform.SetParent(originalSlot.transform);
+                originalSlot.currentItemVisual = dropSlot.currentItemVisual;
+                originalSlot.currentItemData = dropSlot.currentItemData; // Keep data synced
+                dropSlot.currentItemVisual.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
             else
             {
-                originalSlot.currentItem = null;
+                originalSlot.currentItemVisual = null;
+                originalSlot.currentItemData = null;
             }
 
             transform.SetParent(dropSlot.transform);
-            dropSlot.currentItem = gameObject;
+            dropSlot.currentItemVisual = gameObject;
+            // Note: In a full data-driven system, we should update the actual Inventory list here.
         }
         else
         {
