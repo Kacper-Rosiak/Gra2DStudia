@@ -53,9 +53,13 @@ public class InventoryController : MonoBehaviour
         _playerManager.Inventory.OnItemRemoved += (item) => RefreshUI();
         _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
 
-        // Start with backpack visible
-        ShowBackpack();
         RefreshUI();
+    }
+
+    private void OnEnable()
+    {
+        // Odśwież widok przy każdym otwarciu okna na klawisz "I"
+        if (_playerManager != null) RefreshUI();
     }
 
     private void InitializeBackpackSlots()
@@ -81,18 +85,6 @@ public class InventoryController : MonoBehaviour
         if (shieldSlot) shieldSlot.allowedType = ItemType.Shield;
         if (glovesSlot) glovesSlot.allowedType = ItemType.Gloves;
         if (bootsSlot) bootsSlot.allowedType = ItemType.Boots;
-    }
-
-    public void ShowBackpack()
-    {
-        backpackPanel.SetActive(true);
-        equipmentPanel.SetActive(false);
-    }
-
-    public void ShowEquipment()
-    {
-        backpackPanel.SetActive(false);
-        equipmentPanel.SetActive(true);
     }
 
     public void RefreshUI()

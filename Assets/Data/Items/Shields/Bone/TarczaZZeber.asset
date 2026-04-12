@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: TarczaZZeber
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: shield_05
+  itemName: "Tarcza z \u017Beber"
+  description: "Nikt nie powie \u017Ce kradzione"
+  icon: {fileID: 8287529576883199062, guid: 936f60ca0a44d99458f64de31ca3a153, type: 3}
+  type: 4
   bonusAttack: 0
-  bonusDefense: 0
-  bonusMaxHP: 0
+  bonusDefense: 20
+  bonusMaxHP: 10
   healAmount: 0

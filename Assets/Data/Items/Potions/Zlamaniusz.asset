@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: Zlamaniusz
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: potion_04
+  itemName: "Z\u0142amaniusz"
+  description: "Leczy lepiej po z\u0142amaniu ni\u017C p\xF3\u0142 litra"
+  icon: {fileID: 1551452827436881599, guid: 1f1ef26a99481694ebbfece787b1a8ca, type: 3}
+  type: 6
   bonusAttack: 0
   bonusDefense: 0
   bonusMaxHP: 0
-  healAmount: 0
+  healAmount: 60

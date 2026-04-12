@@ -6,6 +6,7 @@ public class PlayerStats
     public event Action<int, int> OnHealthChanged;
     public event Action<int> OnLevelUp;
     public event Action OnDeath;
+    public event Action OnStatsChanged; // <--- DODANE
 
     public int CurrentHP { get; private set; }
     
@@ -57,6 +58,7 @@ public class PlayerStats
         if (CurrentHP > MaxHP) CurrentHP = MaxHP;
         
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+        OnStatsChanged?.Invoke(); // <--- DODANE
     }
 
     public void Heal(int amount)
@@ -108,6 +110,7 @@ public class PlayerStats
 
         OnLevelUp?.Invoke(Level);
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+        OnStatsChanged?.Invoke(); // <--- DODANE
     }
 
 

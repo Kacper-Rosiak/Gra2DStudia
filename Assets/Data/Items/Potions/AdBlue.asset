@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: AdBlue
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: potion_01
+  itemName: AdBlue
+  description: "Spala wi\u0119cej ni\u017C daje"
+  icon: {fileID: -7063221828788384858, guid: ca521cfc699bf8e429dd1172c62c6d28, type: 3}
+  type: 6
   bonusAttack: 0
   bonusDefense: 0
   bonusMaxHP: 0
-  healAmount: 0
+  healAmount: 5

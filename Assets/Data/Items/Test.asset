@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
-  m_Name: Zdrowonicjusz
+  m_Name: Test
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: potion_03
-  itemName: Zdrowonicjusz
-  description: "Leczy lepiej ni\u017C pani edytka"
-  icon: {fileID: 6218059327393886658, guid: c6c95440c887bcd4eae8cc330202fdbf, type: 3}
+  itemID: test_01
+  itemName: Testowy
+  description: testowy
+  icon: {fileID: 974202072, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 6
   bonusAttack: 0
-  bonusDefense: 0
-  bonusMaxHP: 0
-  healAmount: 30
+  bonusDefense: 152
+  bonusMaxHP: 40
+  healAmount: 0

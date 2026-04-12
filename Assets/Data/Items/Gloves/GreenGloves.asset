@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: GreenGloves
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: gloves_01
+  itemName: "R\u0119kawice z Orka"
+  description: "Wysk\xF3rowany ork wzmacnia tw\xF3j pancerz"
+  icon: {fileID: 8759818997279944344, guid: 8239637a0949c144ab8ca594287785d9, type: 3}
+  type: 2
   bonusAttack: 0
-  bonusDefense: 0
+  bonusDefense: 6
   bonusMaxHP: 0
   healAmount: 0

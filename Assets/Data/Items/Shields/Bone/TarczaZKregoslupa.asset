@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: TarczaZKregoslupa
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: shield_04
+  itemName: "Tarcza z Kr\u0119gos\u0142upa"
+  description: "Ko\u015Bciotrup p\u0142aka\u0142 jak oddawa\u0142"
+  icon: {fileID: -4225111264100749204, guid: 936f60ca0a44d99458f64de31ca3a153, type: 3}
+  type: 4
   bonusAttack: 0
-  bonusDefense: 0
-  bonusMaxHP: 0
+  bonusDefense: 25
+  bonusMaxHP: 15
   healAmount: 0

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
   m_Name: MetalGloves
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemID: 
-  itemName: 
-  description: 
-  icon: {fileID: 0}
-  type: 0
+  itemID: glove_03
+  itemName: "Metalowe r\u0119kawice Kowala"
+  description: "Kowalowi si\u0119 znudzi\u0142y"
+  icon: {fileID: -7198044597094674894, guid: 8239637a0949c144ab8ca594287785d9, type: 3}
+  type: 2
   bonusAttack: 0
-  bonusDefense: 0
-  bonusMaxHP: 0
+  bonusDefense: 17
+  bonusMaxHP: 9
   healAmount: 0
