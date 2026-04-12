@@ -2,20 +2,60 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
+    [Header("Menus")]
+    public GameObject inventoryCanvas; // Okno pod klawisz 'I'
+    public GameObject systemMenuCanvas; // Okno pod klawisz 'ESC'
 
-    public GameObject menuCanvas;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
-        menuCanvas.SetActive(false);
+        // Upewnij się, że na start wszystko jest zamknięte
+        if (inventoryCanvas != null) inventoryCanvas.SetActive(false);
+        if (systemMenuCanvas != null) systemMenuCanvas.SetActive(false);
+        Time.timeScale = 1f;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Tab))
+        // Obsługa klawisza I (Ekwipunek / Postać)
+        if (Input.GetKeyDown(KeyCode.I))
         {
-            menuCanvas.SetActive(!menuCanvas.activeSelf);
+            ToggleMenu(inventoryCanvas, systemMenuCanvas);
         }
+
+        // Obsługa klawisza ESC (Ustawienia / Osiągnięcia)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleMenu(systemMenuCanvas, inventoryCanvas);
+        }
+    }
+
+    private void ToggleMenu(GameObject target, GameObject other)
+    {
+        if (target == null) return;
+
+        bool isOpening = !target.activeSelf;
+        
+        // Jeśli otwieramy to okno, upewnij się że drugie jest zamknięte
+        if (isOpening && other != null)
+        {
+            other.SetActive(false);
+        }
+
+        target.SetActive(isOpening);
+
+        // Zarządzanie pauzą
+        UpdatePauseState();
+    }
+
+    private void UpdatePauseState()
+    {
+        bool isAnyMenuOpen = (inventoryCanvas != null && inventoryCanvas.activeSelf) || 
+                             (systemMenuCanvas != null && systemMenuCanvas.activeSelf);
+        
+        Time.timeScale = isAnyMenuOpen ? 0f : 1f;
+        
+        // Opcjonalnie: odblokuj kursor myszy jeśli menu jest otwarte
+        Cursor.visible = isAnyMenuOpen;
+        Cursor.lockState = isAnyMenuOpen ? CursorLockMode.None : CursorLockMode.Locked;
     }
 }

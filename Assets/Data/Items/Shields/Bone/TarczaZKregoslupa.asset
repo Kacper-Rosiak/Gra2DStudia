@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
+  m_Name: TarczaZKregoslupa
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemID: shield_04
+  itemName: "Tarcza z Kr\u0119gos\u0142upa"
+  description: "Ko\u015Bciotrup p\u0142aka\u0142 jak oddawa\u0142"
+  icon: {fileID: -4225111264100749204, guid: 936f60ca0a44d99458f64de31ca3a153, type: 3}
+  type: 4
+  bonusAttack: 0
+  bonusDefense: 25
+  bonusMaxHP: 15
+  healAmount: 0

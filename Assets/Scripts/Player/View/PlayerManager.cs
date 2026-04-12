@@ -9,7 +9,12 @@ public class PlayerManager : MonoBehaviour
     public PlayerClassData startingClass; // <--- DODANE: Referencja do danych z edytora Unity
 
     public PlayerStats Stats { get; private set; }
-    public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolno�� klasy
+    public Inventory Inventory { get; private set; }
+    public Equipment Equipment { get; private set; }
+    public int inventoryCapacity = 24;
+
+    public IAbilityStrategy CurrentAbility { get; private set; } // <--- DODANE: Aktywna zdolno klasy
+
 
     
 
@@ -22,12 +27,15 @@ public class PlayerManager : MonoBehaviour
     {
         
 
-        // 1. Inicjalizacja statystyk na podstawie podpi�tych danych z edytora
+        // 1. Inicjalizacja statystyk na podstawie podpitych danych z edytora
         if (startingClass != null)
         {
             Stats = new PlayerStats(startingClass);
+            Inventory = new Inventory();
+            Equipment = new Equipment(Stats);
             CurrentAbility = CreateStrategyForClass(startingClass.className);
         }
+
         else
         {
             Debug.LogError("Brak przypisanej klasy postaci w PlayerManager! Przeci�gnij PlayerClassData do Inspektora.");

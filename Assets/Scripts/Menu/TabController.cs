@@ -4,8 +4,8 @@ public class TabController : MonoBehaviour
 {
     public Image[] tabImages;
     public GameObject[] pages;
-     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // Wykonuje się za każdym razem, gdy obiekt menu zostaje włączony (np. klawiszem ESC)
+    void OnEnable()
     {
         ActivateTab(0);
     }
