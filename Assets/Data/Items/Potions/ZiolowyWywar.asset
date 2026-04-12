@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
+  m_Name: ZiolowyWywar
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemID: potion_02
+  itemName: "Zio\u0142owy Wywar"
+  description: "Jak za\u017Cyjesz to nic nie wiesz"
+  icon: {fileID: 9088537865656282905, guid: 7f225fe1e5bae04498d5391d2910409a, type: 3}
+  type: 6
+  bonusAttack: 0
+  bonusDefense: 0
+  bonusMaxHP: 0
+  healAmount: 10
