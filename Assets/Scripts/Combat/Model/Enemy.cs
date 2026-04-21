@@ -10,8 +10,8 @@ public class Enemy : Entity
 
     public Enemy(EnemyData data)
     {
-        IsPlayer = false; // Definiujemy, ¿e to przeciwnik
-        Name = data.enemyId; // Mo¿esz tu przypisaæ inn¹ nazwê z danych, jeœli masz
+        IsPlayer = false; // Definiujemy, e to przeciwnik
+        Name = data.enemyId; // Moesz tu przypisa inn nazw z danych, jeli masz
         EnemyId = data.enemyId;
 
         MaxHP = data.maxHP;
@@ -21,13 +21,13 @@ public class Enemy : Entity
         Speed = data.speed;
         XPReward = data.xpReward;
 
-        // DodgeChance pozostaje domyœlnie na 0, bo nie zmieniamy go w konstruktorze
+        // DodgeChance pozostaje domylnie na 0, bo nie zmieniamy go w konstruktorze
     }
 
     public override void TakeDamage(int damage)
     {
-        // Obra¿enia zosta³y ju¿ pomniejszone o pancerz w AttackCommand, 
-        // wiêc tu tylko odejmujemy punkty zdrowia.
+        // Obraï¿½enia zostaï¿½y juï¿½ pomniejszone o pancerz w AttackCommand, 
+        // wiï¿½c tu tylko odejmujemy punkty zdrowia.
         base.TakeDamage(damage);
 
         if (!IsAlive())
