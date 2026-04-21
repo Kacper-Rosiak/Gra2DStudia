@@ -26,6 +26,9 @@ public class ItemData : ScriptableObject
     [Header("Type")]
     public ItemType type;
 
+    [Header("Price")]
+    public int price;
+
     [Header("Stats Bonus")]
     public int bonusAttack;
     public int bonusDefense;
