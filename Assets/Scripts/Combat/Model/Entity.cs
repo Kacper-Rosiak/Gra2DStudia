@@ -6,7 +6,7 @@ public abstract class Entity : ICombatEntity
     public string Name { get; set; }
     public bool IsPlayer { get; set; }
 
-    // --- TO DODA£EM (NADAJNIK) ---
+    // --- TO DODAEM (NADAJNIK) ---
     public event Action<int, int> OnHealthChanged;
     // ----------------------------
 
@@ -25,7 +25,7 @@ public abstract class Entity : ICombatEntity
         CurrentHP -= damage;
         if (CurrentHP < 0) CurrentHP = 0;
 
-        // --- TO DODA£EM (SYGNA£ DO UI) ---
+        // --- TO DODAï¿½EM (SYGNAï¿½ DO UI) ---
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
         // --------------------------------
     }
