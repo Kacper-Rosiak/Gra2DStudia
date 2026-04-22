@@ -178,8 +178,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Wyjd\u017A"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -315,8 +315,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Wczytaj gr\u0119"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -501,8 +501,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Kontynuuj
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -654,6 +654,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 666872639}
   m_CullTransparentMesh: 1
+--- !u!1 &677736160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 677736162}
+  - component: {fileID: 677736161}
+  m_Layer: 0
+  m_Name: _MenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &677736161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677736160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e7c5046197bc4aaccb9ca5ca28d3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
+--- !u!4 &677736162
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677736160}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 974.10535, y: 512.26184, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1109764561
 GameObject:
   m_ObjectHideFlags: 0
@@ -1397,7 +1441,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1887258763}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 677736161}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: StartNewGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1895607013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1457,8 +1513,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Nowa gra
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1726,3 +1782,4 @@ SceneRoots:
   - {fileID: 1867719441}
   - {fileID: 482084121}
   - {fileID: 1109764563}
+  - {fileID: 677736162}
