@@ -3,14 +3,34 @@ using UnityEngine.SceneManagement;
 
 public class LevelTransition : MonoBehaviour
 {
-    private string sceneToLoad = "DungeonScene";
+    [SerializeField] private string sceneToLoad = "DungeonScene";
+    [SerializeField] private GameObject interactUI;
+
+    private bool isPlayerInRange = false;
+
+    private void Update()
+    {
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            SceneManager.LoadScene(sceneToLoad);
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Upewnij siê, ¿e obiekt, który wszed³ w trigger, to gracz (np. sprawdzaj¹c Tag)
         if (collision.CompareTag("Player"))
         {
-            SceneManager.LoadScene(sceneToLoad);
+            isPlayerInRange = true;
+            if (interactUI != null) interactUI.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isPlayerInRange = false;
+            if (interactUI != null) interactUI.SetActive(false);
         }
     }
 }

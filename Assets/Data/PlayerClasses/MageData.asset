@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClassData
   className: Mage
   classIcon: {fileID: -4716067549494828712, guid: 421160bd7ebeb2c47a71f5b48de0d32f, type: 3}
+  classPrefab: {fileID: 4396049251017445309, guid: 97d82cb6af581e6438759afacd0cc570, type: 3}
   baseMaxHP: 70
   baseAttack: 40
   baseDefense: 10

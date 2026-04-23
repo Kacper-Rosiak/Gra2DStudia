@@ -5,6 +5,7 @@ public class PlayerClassData : ScriptableObject
 {
     public string className;
     public Sprite classIcon;
+    public GameObject classPrefab;
 
     [Header("Base Stats")]
     public int baseMaxHP;

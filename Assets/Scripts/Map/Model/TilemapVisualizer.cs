@@ -69,6 +69,12 @@ public class TilemapVisualizer : MonoBehaviour
         wallTilemap.ClearAllTiles();
     }
 
+    public void CompressAllBounds()
+    {
+        floorTilemap.CompressBounds();
+        wallTilemap.CompressBounds();
+    }
+
     internal void PaintSingleCornerWall(Vector2Int position, string binaryType)
     {
         
