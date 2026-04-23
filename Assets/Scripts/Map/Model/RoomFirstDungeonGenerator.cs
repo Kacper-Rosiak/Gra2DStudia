@@ -42,11 +42,45 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             roomCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
         }
 
+        // Przeniesienie gracza do pierwszego wygenerowanego pokoju
+        if (roomCenters.Count > 0)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            
+            // Jeśli gracza nie ma, spróbuj go zespawnować TERAZ przez spawner
+            if (player == null && PlayerSpawner.Instance != null)
+            {
+                player = PlayerSpawner.Instance.SpawnPlayer();
+            }
+
+            if (player != null)
+            {
+                Vector3 newPos = new Vector3(roomCenters[0].x, roomCenters[0].y, 0);
+                
+                // Używamy Rigidbody2D do teleportacji, jeśli istnieje, aby nie kłócić się z silnikiem fizyki
+                Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+                if (rb != null)
+                {
+                    rb.position = newPos;
+                }
+                player.transform.position = newPos;
+                
+                Debug.Log($"Generator: Teleportowano gracza do środka pokoju: {newPos}");
+
+                // Ponowne przypisanie kamery po teleportacji
+                if (PlayerSpawner.Instance != null)
+                {
+                    PlayerSpawner.Instance.AssignCamera(player);
+                }
+            }
+        }
+
         HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
         floor.UnionWith(corridors);
 
         tilemapVisualizer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tilemapVisualizer);
+        tilemapVisualizer.CompressAllBounds();
     }
 
     private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)
@@ -80,7 +114,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             Vector2Int closest = FindClosestPointTo(currentRoomCenter, roomCenters);
             roomCenters.Remove(closest);
 
-            // Generujemy �cie�k� mi�dzy pokojami
+            // Generujemy �cie�k� mi�dzy pokojami
             HashSet<Vector2Int> newCorridor = CreateCorridor(currentRoomCenter, closest);
 
             currentRoomCenter = closest;
@@ -125,7 +159,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         return IncreaseCorridorBrush3by3(corridor);
     }
 
-    // DODANA METODA POGRUBIAJ�CA (Dostosowana do HashSet)
+    // DODANA METODA POGRUBIAJ�CA (Dostosowana do HashSet)
     private HashSet<Vector2Int> IncreaseCorridorBrush3by3(HashSet<Vector2Int> corridor)
     {
         HashSet<Vector2Int> newCorridor = new HashSet<Vector2Int>();

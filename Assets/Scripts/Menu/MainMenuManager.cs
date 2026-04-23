@@ -5,7 +5,7 @@ public class MainMenuManager : MonoBehaviour
 {
     public void StartNewGame()
     {
-        // Tutaj wpisz DOKŁADNĄ nazwę sceny, na której masz ten piękny loch z wyborem postaci
-        SceneManager.LoadScene("WyborPostaci");
+        // Nazwa sceny musi pasować do nazwy pliku w Assets/Scenes/
+        SceneManager.LoadScene("CharacterSelection");
     }
 }
