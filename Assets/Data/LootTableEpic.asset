@@ -12,4 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d19b8f6363a34a4c98a1a72cb98cbbf, type: 3}
   m_Name: LootTableEpic
   m_EditorClassIdentifier: Assembly-CSharp::LootTable
-  items: []
+  items:
+  - itemId: boneWeapon_01
+    dropChance: 0.1
+  - itemId: boneWeapon_02
+    dropChance: 0.1
+  - itemId: shield_04
+    dropChance: 0.1
+  - itemId: shield_05
+    dropChance: 0.1
+  - itemId: glove_03
+    dropChance: 0.1

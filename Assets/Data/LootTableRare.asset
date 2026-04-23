@@ -12,4 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d19b8f6363a34a4c98a1a72cb98cbbf, type: 3}
   m_Name: LootTableRare
   m_EditorClassIdentifier: Assembly-CSharp::LootTable
-  items: []
+  items:
+  - itemId: magic_02
+    dropChance: 0.2
+  - itemId: shield_02
+    dropChance: 0.2
+  - itemId: potion_01
+    dropChance: 0.2
+  - itemId: potion_03
+    dropChance: 0.2
+  - itemId: potion_02
+    dropChance: 0.2
+  - itemId: potion_04
+    dropChance: 0.2
+  - itemId: gloves_02
+    dropChance: 0.2

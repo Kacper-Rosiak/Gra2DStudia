@@ -16,11 +16,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
     [SerializeField] private Transform entityParent;
     [SerializeField] private int maxEnemiesPerDungeon = 10;
     [SerializeField] private int maxChestsPerDungeon = 2;
-    [SerializeField] private int minEnemyDistanceFromWall = 2; // NOWY ARGUMENT: Odleg³oœæ wroga od œciany
+    [SerializeField] private int minEnemyDistanceFromWall = 2; // NOWY ARGUMENT: Odlegï¿½oï¿½ï¿½ wroga od ï¿½ciany
 
     protected override void RunProceduralGeneration()
     {
-        // Gwarancja czystej sceny przed now¹ generacj¹
+        // Gwarancja czystej sceny przed nowï¿½ generacjï¿½
         if (entityParent != null)
         {
             for (int i = entityParent.childCount - 1; i >= 0; i--)
@@ -82,12 +82,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
 
         tilemapVisualizer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tilemapVisualizer);
-<<<<<<< Updated upstream
         tilemapVisualizer.CompressAllBounds();
-=======
-
         PopulateRooms(roomsList, floor, corridors);
->>>>>>> Stashed changes
     }
 
     private void PopulateRooms(List<BoundsInt> rooms, HashSet<Vector2Int> floor, HashSet<Vector2Int> corridors)
@@ -115,7 +111,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             List<Vector2Int> safePoints = GetSafeSpawnPoints(room, floor, corridors);
             if (safePoints.Count == 0) continue;
 
-            // 1. LOGIKA SKRZYÑ (Max 2, na œrodku pokoju)
+            // 1. LOGIKA SKRZYï¿½ (Max 2, na ï¿½rodku pokoju)
             if (totalChestsSpawned < maxChestsPerDungeon)
             {
                 if (Random.value < 0.6f)
@@ -127,10 +123,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 }
             }
 
-            // 2. LOGIKA PRZECIWNIKÓW (Odleg³oœæ od œciany, max 1 w pokoju)
+            // 2. LOGIKA PRZECIWNIKï¿½W (Odlegï¿½oï¿½ï¿½ od ï¿½ciany, max 1 w pokoju)
             if (totalEnemiesSpawned < maxEnemiesPerDungeon)
             {
-                // Filtrujemy bezpieczne punkty przez nasz¹ now¹ metodê dystansu od œcian
+                // Filtrujemy bezpieczne punkty przez naszï¿½ nowï¿½ metodï¿½ dystansu od ï¿½cian
                 List<Vector2Int> enemySafePoints = GetPointsAwayFromWall(safePoints, floor, minEnemyDistanceFromWall);
 
                 if (enemySafePoints.Count > 0)
@@ -143,7 +139,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         }
     }
 
-    // --- NOWA METODA: Odrzucanie punktów zbyt blisko œcian ---
+    // --- NOWA METODA: Odrzucanie punktï¿½w zbyt blisko ï¿½cian ---
     private List<Vector2Int> GetPointsAwayFromWall(List<Vector2Int> safePoints, HashSet<Vector2Int> floor, int requiredDistance)
     {
         List<Vector2Int> filteredPoints = new List<Vector2Int>();
@@ -152,12 +148,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         {
             bool isFarEnough = true;
 
-            // Sprawdzamy kwadrat (np. 5x5 dla dystansu 2) wokó³ punktu spawnu
+            // Sprawdzamy kwadrat (np. 5x5 dla dystansu 2) wokï¿½ punktu spawnu
             for (int x = -requiredDistance; x <= requiredDistance; x++)
             {
                 for (int y = -requiredDistance; y <= requiredDistance; y++)
                 {
-                    // Jeœli w promieniu 2 kratek brakuje pod³ogi, znaczy ¿e natrafiliœmy na œcianê (lub pustkê)
+                    // Jeï¿½li w promieniu 2 kratek brakuje podï¿½ogi, znaczy ï¿½e natrafiliï¿½my na ï¿½cianï¿½ (lub pustkï¿½)
                     if (!floor.Contains(pos + new Vector2Int(x, y)))
                     {
                         isFarEnough = false;
@@ -265,12 +261,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         {
             Vector2Int closest = FindClosestPointTo(currentRoomCenter, roomCenters);
             roomCenters.Remove(closest);
-<<<<<<< Updated upstream
-
-            // Generujemy ï¿½cieï¿½kï¿½ miï¿½dzy pokojami
-=======
->>>>>>> Stashed changes
-            HashSet<Vector2Int> newCorridor = CreateCorridor(currentRoomCenter, closest);
+// Generujemy Å›cieÅ¼kÄ™ miÄ™dzy pokojami
+HashSet<Vector2Int> newCorridor = CreateCorridor(currentRoomCenter, closest);
             currentRoomCenter = closest;
             corridors.UnionWith(newCorridor);
         }
@@ -297,11 +289,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         return IncreaseCorridorBrush3by3(corridor);
     }
 
-<<<<<<< Updated upstream
-    // DODANA METODA POGRUBIAJï¿½CA (Dostosowana do HashSet)
-=======
->>>>>>> Stashed changes
-    private HashSet<Vector2Int> IncreaseCorridorBrush3by3(HashSet<Vector2Int> corridor)
+// DODANA METODA POGRUBIAJÄ„CA (Dostosowana do HashSet)
+private HashSet<Vector2Int> IncreaseCorridorBrush3by3(HashSet<Vector2Int> corridor)
     {
         HashSet<Vector2Int> newCorridor = new HashSet<Vector2Int>();
         foreach (var pos in corridor)
