@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6198532343512341414}
   - component: {fileID: 2415233247076549962}
   - component: {fileID: 552792300670901587}
+  - component: {fileID: 5878931460154149673}
   m_Layer: 0
   m_Name: Orc - Warrior
   m_TagString: Untagged
@@ -78,8 +79,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -920553993
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 5465485739656645832, guid: 332acf50176fbb04887a7883a1d2792e, type: 3}
@@ -114,3 +115,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5878931460154149673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496246422981166835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 221b14c871aa2e945aecb5892269fc42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyOnMap
+  databaseEnemyId: Orc Warrior
