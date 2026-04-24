@@ -119,6 +119,68 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &46275110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 46275111}
+  m_Layer: 0
+  m_Name: EnemySpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &46275111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46275110}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1697, y: 398, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &74772923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74772924}
+  m_Layer: 0
+  m_Name: PlayerSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &74772924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74772923}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 833, y: 84, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &76728821
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,8 +390,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Unik
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -500,8 +562,8 @@ Canvas:
   m_GameObject: {fileID: 390601350}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 2030571944}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -909,6 +971,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatController
   uiController: {fileID: 2103532882}
+  playerSpawnPoint: {fileID: 74772924}
+  enemySpawnPoint: {fileID: 46275111}
+  playerScale: 200
+  enemyScale: 120
+  combatSortingOrder: 10000
+  characterSortingLayer: Default
+  backgroundSortingLayer: Background
 --- !u!4 &580923151
 Transform:
   m_ObjectHideFlags: 0
@@ -1088,8 +1157,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: TURA GRACZA
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1580,8 +1649,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Atak Specjalny
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1850,8 +1919,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Oczekiwanie na ruch
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1987,8 +2056,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Atak
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2370,7 +2439,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 540
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2395,7 +2464,7 @@ Transform:
   m_GameObject: {fileID: 2030571942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 1277, y: 536, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2504,8 +2573,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Ucieczka
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
-  m_sharedMaterial: {fileID: -4515505878380053187, guid: 933839b0d4f4f1c4ab5ffbc53bf6fabd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2640,3 +2709,5 @@ SceneRoots:
   - {fileID: 1873739372}
   - {fileID: 2103532883}
   - {fileID: 580923151}
+  - {fileID: 74772924}
+  - {fileID: 46275111}
