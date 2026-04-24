@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9b1accab5fdbcf4491b53b05f573803, type: 3}
   m_Name: Skieleton
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyId: Orc
+  enemyId: Skeleton
   maxHP: 70
   attack: 12
   defense: 6

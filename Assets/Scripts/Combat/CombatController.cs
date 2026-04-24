@@ -5,6 +5,7 @@ public class CombatController : MonoBehaviour
 {
     [Header("Referencje UI")]
     [SerializeField] private CombatUIController uiController;
+    [SerializeField] private EnemyFactory enemyFactory; // Dodana referencja do fabryki
 
     [Header("Pozycje Walki")]
     [SerializeField] private Transform playerSpawnPoint;
@@ -27,10 +28,14 @@ public class CombatController : MonoBehaviour
     private GameObject _enemyObj;
     private bool _scalingEnforced = false;
 
+    private void Awake()
+    {
+        // Inicjalizujemy silnik natychmiast, aby był gotowy przed InitializeCombat
+        _combatManager = new CombatManager();
+    }
+
     void Start()
     {
-        _combatManager = new CombatManager();
-
         if (uiController == null)
         {
             Debug.LogError("CombatController: Nie przypisano CombatUIController!");
@@ -56,7 +61,11 @@ public class CombatController : MonoBehaviour
 
     public void InitializeCombat(GameObject playerObj, GameObject enemyObj)
     {
-        if (playerObj == null || enemyObj == null) return;
+        if (playerObj == null || enemyObj == null)
+        {
+            Debug.LogError("CombatController: Próba startu z brakującymi obiektami postaci!");
+            return;
+        }
 
         _playerObj = playerObj;
         _enemyObj = enemyObj;
@@ -71,6 +80,8 @@ public class CombatController : MonoBehaviour
             combatCam = root.GetComponentInChildren<Camera>();
             if (combatCam != null) break;
         }
+
+        if (combatCam == null) Debug.LogError("CombatController: NIE ZNALEZIONO KAMERY W SCENIE WALKI!");
 
         // 1. Konfiguracja Canvasa (Tła)
         Canvas canvas = uiController.GetComponentInParent<Canvas>();
@@ -104,19 +115,32 @@ public class CombatController : MonoBehaviour
         if (playerSpawnPoint != null) playerObj.transform.position = new Vector3(playerSpawnPoint.position.x, playerSpawnPoint.position.y, 10f);
         if (enemySpawnPoint != null) enemyObj.transform.position = new Vector3(enemySpawnPoint.position.x, enemySpawnPoint.position.y, 10f);
 
-        Debug.Log($"CombatController: Ustawiono Z = 10. Tło odsunięte na PlaneDistance = 30.");
-
         // 4. Pobranie danych i start walki
         EnemyOnMap enemyOnMap = enemyObj.GetComponent<EnemyOnMap>();
-        EnemyFactory factory = FindFirstObjectByType<EnemyFactory>();
+        
+        // Szukamy fabryki: najpierw przypisana ręcznie, potem na scenie
+        EnemyFactory factory = enemyFactory != null ? enemyFactory : FindFirstObjectByType<EnemyFactory>();
         PlayerManager playerManager = playerObj.GetComponent<PlayerManager>();
 
         if (factory != null && playerManager != null && enemyOnMap != null)
         {
+            Debug.Log($"CombatController: Inicjalizacja modeli dla: {enemyOnMap.databaseEnemyId}");
             Enemy enemyModel = factory.CreateEnemy(enemyOnMap.databaseEnemyId);
             Entity playerModel = playerManager.GetCombatEntity(playerManager.playerName);
 
-            SetupBattle(playerModel, enemyModel);
+            if (enemyModel != null && playerModel != null)
+            {
+                SetupBattle(playerModel, enemyModel);
+                Debug.Log("CombatController: WALKA URUCHOMIONY POMYŚLNIE.");
+            }
+            else
+            {
+                Debug.LogError($"CombatController: Błąd tworzenia modeli. EnemyModel: {enemyModel != null}, PlayerModel: {playerModel != null}");
+            }
+        }
+        else
+        {
+            Debug.LogError($"CombatController: BRAK KOMPONENTÓW! Factory: {factory != null}, PlayerManager: {playerManager != null}, EnemyOnMap: {enemyOnMap != null}");
         }
     }
 
@@ -144,6 +168,9 @@ public class CombatController : MonoBehaviour
     {
         uiController.ShowMessage($"Walka zakończona: {result}");
         
+        // Zatrzymujemy wymuszanie skali, aby menedżer mógł przywrócić oryginał
+        _scalingEnforced = false;
+        
         // Powiadomienie menedżera o zakończeniu po krótkim opóźnieniu
         StartCoroutine(EndBattleWithDelay(result == BattleResult.Victory));
     }
@@ -161,30 +188,40 @@ public class CombatController : MonoBehaviour
 
     public void OnAttackButtonClicked()
     {
-        // Sprawdzamy czy to tura gracza
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
-
-        // Zabezpieczenie przed brakiem danych
         if (_player == null || _enemy == null) return;
 
         Debug.Log("UI: Kliknięto przycisk ATAK");
-
-        // Tworzymy komendę ataku (zgodnie z systemem kolegów)
-        // message => uiController.ShowMessage(message) przesyła opis ataku do logu walki
-        ICombatCommand attack = new AttackCommand(_player, _enemy, message => uiController.ShowMessage(message));
-
-        // Wykonujemy akcję w silniku walki
+        ICombatCommand attack = new AttackCommand(_player, _enemy, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
         _combatManager.ExecuteTurnAction(attack);
+    }
+
+    public void OnSpecialAttackButtonClicked()
+    {
+        if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
+        if (_player == null || _enemy == null) return;
+
+        // Pobieramy specjalną umiejętność rzutując na klasę Player
+        if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
+        {
+            Debug.Log($"UI: Kliknięto ATAK SPECJALNY ({playerInstance.SpecialAbility.GetType().Name})");
+            ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
+            _combatManager.ExecuteTurnAction(special);
+        }
+        else
+        {
+            uiController.ShowMessage("<color=green>[Akcja gracza]</color> Ta postać nie posiada umiejętności specjalnej!");
+        }
     }
 
     public void OnDefendButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
+        if (_player == null) return;
 
-        uiController.ShowMessage("Bohater przyjmuje postawę obronną!");
-
-        // Tutaj można wywołać DefendCommand, jeśli jest zaimplementowany:
-        // _combatManager.ExecuteTurnAction(new DefendCommand(_player));
+        Debug.Log("UI: Kliknięto przycisk OBRONA");
+        ICombatCommand defend = new DefendCommand(_player, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
+        _combatManager.ExecuteTurnAction(defend);
     }
 
     public void OnEscapeButtonClicked()

@@ -21,9 +21,10 @@ public class Player : Entity
         SpecialAbility = ability;
     }
 
-    // Przekazujemy otrzymane obra�enia bezpo�rednio do PlayerStats
+    // Przekazujemy otrzymane obraenia bezporednio do PlayerStats
     public override void TakeDamage(int damage)
     {
         _stats.TakeDamage(damage);
+        NotifyHealthChanged();
     }
 }

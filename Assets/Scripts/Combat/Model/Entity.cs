@@ -25,9 +25,14 @@ public abstract class Entity : ICombatEntity
         CurrentHP -= damage;
         if (CurrentHP < 0) CurrentHP = 0;
 
-        // --- TO DODA�EM (SYGNA� DO UI) ---
+        // --- TO DODAEM (SYGNA DO UI) ---
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
         // --------------------------------
+    }
+
+    public void NotifyHealthChanged()
+    {
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
     }
 
     public bool IsAlive() => CurrentHP > 0;
