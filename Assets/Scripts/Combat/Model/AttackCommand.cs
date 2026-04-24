@@ -18,18 +18,18 @@ public class AttackCommand : ICombatCommand
     {
         Random rnd = new Random();
 
-        // 1. Logika Uniku (Dodge) - uruchomi siê tylko jeœli DodgeChance > 0
+        // 1. Logika Uniku (Dodge) - uruchomi siï¿½ tylko jeï¿½li DodgeChance > 0
         if (_target.DodgeChance > 0 && rnd.Next(0, 100) < _target.DodgeChance)
         {
             _combatLogCallback?.Invoke($"{_attacker.Name} atakuje, ale {_target.Name} wykonuje unik!");
             return;
         }
 
-        // 2. Logika Obra¿eñ (Pancerz jest uwzglêdniany tylko tutaj)
+        // 2. Logika Obraï¿½eï¿½ (Pancerz jest uwzglï¿½dniany tylko tutaj)
         int damage = Math.Max(1, _attacker.Attack - _target.Defense);
 
-        // 3. Zaaplikowanie obra¿eñ i wys³anie logu
+        // 3. Zaaplikowanie obrae i wysanie logu
         _target.TakeDamage(damage);
-        _combatLogCallback?.Invoke($"{_attacker.Name} trafia! Zadaje {damage} obra¿eñ postaci {_target.Name}.");
-    }
-}
+        _combatLogCallback?.Invoke($"{_attacker.Name} atakuje za {damage} pkt obraÅ¼eÅ„ w {_target.Name}!");
+        }
+        }

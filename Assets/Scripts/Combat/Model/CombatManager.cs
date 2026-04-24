@@ -21,7 +21,7 @@ public class CombatManager
         _initiativeQueue = participants.OrderByDescending(p => p.Speed).ToList();
         _currentTurnIndex = 0;
 
-        OnCombatLog?.Invoke("Starcie siê rozpoczyna!");
+        OnCombatLog?.Invoke("Starcie siï¿½ rozpoczyna!");
         ProceedToNextTurn();
     }
 
@@ -31,10 +31,10 @@ public class CombatManager
 
         Entity activeEntity = _initiativeQueue[_currentTurnIndex];
 
-        // 1. Aktywacja efektów na starcie tury (np. trucizna z klasy Assassin)
+        // 1. Aktywacja efektï¿½w na starcie tury (np. trucizna z klasy Assassin)
         activeEntity.TriggerTurnStartEffects(log => OnCombatLog?.Invoke(log));
 
-        // Jeœli postaæ umar³a od efektu (np. poparzenia), przejdŸ do podsumowania
+        // Jeï¿½li postaï¿½ umarï¿½a od efektu (np. poparzenia), przejdï¿½ do podsumowania
         if (!activeEntity.IsAlive())
         {
             ChangeState(BattleState.Resolution);
@@ -42,11 +42,11 @@ public class CombatManager
             return;
         }
 
-        // 2. Obs³uga og³uszenia (np. z klasy Warrior)
+        // 2. Obsï¿½uga ogï¿½uszenia (np. z klasy Warrior)
         if (activeEntity.IsStunned)
         {
-            OnCombatLog?.Invoke($"{activeEntity.Name} jest og³uszony i traci turê!");
-            activeEntity.IsStunned = false; // Resetujemy status po pominiêciu tury
+            OnCombatLog?.Invoke($"{activeEntity.Name} jest ogï¿½uszony i traci turï¿½!");
+            activeEntity.IsStunned = false; // Resetujemy status po pominiï¿½ciu tury
 
             ChangeState(BattleState.Resolution);
             ResolveTurn();
@@ -57,7 +57,7 @@ public class CombatManager
         if (activeEntity.IsPlayer)
         {
             ChangeState(BattleState.PlayerTurn);
-            // Tutaj system czeka. Nic siê nie dzieje, dopóki Gracz nie kliknie przycisku ataku.
+            // Tutaj system czeka. Nic siï¿½ nie dzieje, dopï¿½ki Gracz nie kliknie przycisku ataku.
         }
         else
         {
@@ -68,22 +68,28 @@ public class CombatManager
     }
 
     // --- NOWA METODA: Skrypt tury wroga dla walk 1v1 ---
-    private void ExecuteEnemyTurn(Entity enemy)
+    private async void ExecuteEnemyTurn(Entity enemy)
     {
-        // W walce 1v1 celem jest po prostu jedyny gracz na liœcie inicjatywy
+        // W walce 1v1 celem jest po prostu jedyny gracz na licie inicjatywy
         Entity playerTarget = _initiativeQueue.Find(e => e.IsPlayer);
 
         if (playerTarget != null && playerTarget.IsAlive())
         {
-            // Tworzymy komendê zwyk³ego ataku dla wroga
+            // OpÃ³nienie 5 sekund przed ruchem wroga
+            await System.Threading.Tasks.Task.Delay(5000);
+
+            // Sprawdzenie czy walka nadal trwa po odczekaniu
+            if (CurrentState != BattleState.EnemyTurn) return;
+
+            // Tworzymy komend zwykego ataku dla wroga
             ICombatCommand enemyAttack = new AttackCommand(enemy, playerTarget, log => OnCombatLog?.Invoke($"<color=red>[WROGI ATAK]</color> {log}"));
 
-            // ExecuteTurnAction samo zajmie siê wywo³aniem komendy i popchniêciem kolejki dalej
+            // ExecuteTurnAction samo zajmie si wywoaniem komendy i popchniciem kolejki dalej
             ExecuteTurnAction(enemyAttack);
         }
         else
         {
-            // Zabezpieczenie, gdyby gracza nie by³o (np. zgin¹³ wczeœniej)
+            // Zabezpieczenie, gdyby gracza nie byo (np. zgin wczeniej)
             ChangeState(BattleState.Resolution);
             ResolveTurn();
         }
@@ -133,12 +139,12 @@ public class CombatManager
         Random rnd = new Random();
         if (rnd.Next(0, 100) < successChancePercent)
         {
-            OnCombatLog?.Invoke("Uda³o ci siê uciec z pola walki!");
+            OnCombatLog?.Invoke("Udaï¿½o ci siï¿½ uciec z pola walki!");
             EndBattle(BattleResult.Escaped);
         }
         else
         {
-            OnCombatLog?.Invoke("Próba ucieczki nie powiod³a siê! Tracisz turê.");
+            OnCombatLog?.Invoke("Prï¿½ba ucieczki nie powiodï¿½a siï¿½! Tracisz turï¿½.");
             ChangeState(BattleState.Resolution);
             ResolveTurn();
         }
