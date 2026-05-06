@@ -5,16 +5,16 @@ public class CombatController : MonoBehaviour
 {
     [Header("Referencje UI")]
     [SerializeField] private CombatUIController uiController;
-    [SerializeField] private EnemyFactory enemyFactory; // Dodana referencja do fabryki
+    [SerializeField] private EnemyFactory enemyFactory;
 
     [Header("Pozycje Walki")]
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private Transform enemySpawnPoint;
-    
+
     [Header("Skalowanie")]
-    [SerializeField] private float playerScale = 120f; // Osobna skala dla gracza
-    [SerializeField] private float enemyScale = 100f;  // Osobna skala dla wroga
-    
+    [SerializeField] private float playerScale = 120f;
+    [SerializeField] private float enemyScale = 100f;
+
     [Header("Warstwy i Widoczność")]
     [SerializeField] private int combatSortingOrder = 10000;
     [SerializeField] private string characterSortingLayer = "Default";
@@ -30,7 +30,6 @@ public class CombatController : MonoBehaviour
 
     private void Awake()
     {
-        // Inicjalizujemy silnik natychmiast, aby był gotowy przed InitializeCombat
         _combatManager = new CombatManager();
     }
 
@@ -44,7 +43,6 @@ public class CombatController : MonoBehaviour
 
     void LateUpdate()
     {
-        // Zabezpieczenie przed skalami 0
         float pS = playerScale > 0.001f ? playerScale : 120f;
         float eS = enemyScale > 0.001f ? enemyScale : 100f;
 
@@ -52,8 +50,7 @@ public class CombatController : MonoBehaviour
         {
             _playerObj.transform.localScale = new Vector3(pS, pS, 1f);
             _enemyObj.transform.localScale = new Vector3(-eS, eS, 1f);
-            
-            // WYMAGANIE UŻYTKOWNIKA: Pozycja Z = 10f
+
             _playerObj.transform.position = new Vector3(_playerObj.transform.position.x, _playerObj.transform.position.y, 10f);
             _enemyObj.transform.position = new Vector3(_enemyObj.transform.position.x, _enemyObj.transform.position.y, 10f);
         }
@@ -61,17 +58,12 @@ public class CombatController : MonoBehaviour
 
     public void InitializeCombat(GameObject playerObj, GameObject enemyObj)
     {
-        if (playerObj == null || enemyObj == null)
-        {
-            Debug.LogError("CombatController: Próba startu z brakującymi obiektami postaci!");
-            return;
-        }
+        if (playerObj == null || enemyObj == null) return;
 
         _playerObj = playerObj;
         _enemyObj = enemyObj;
         _scalingEnforced = true;
 
-        // 0. Znajdź parametry warstw i kamerę
         int uiLayer = LayerMask.NameToLayer("UI");
         Camera combatCam = null;
         var rootObjects = gameObject.scene.GetRootGameObjects();
@@ -81,79 +73,55 @@ public class CombatController : MonoBehaviour
             if (combatCam != null) break;
         }
 
-        if (combatCam == null) Debug.LogError("CombatController: NIE ZNALEZIONO KAMERY W SCENIE WALKI!");
-
-        // 1. Konfiguracja Canvasa (Tła)
         Canvas canvas = uiController.GetComponentInParent<Canvas>();
         if (canvas != null)
         {
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.worldCamera = combatCam;
-            // Skoro postacie są na Z = 10, a kamera na Z = -10 (odległość 20),
-            // to tło musi być dalej niż 20 jednostek od kamery.
-            canvas.planeDistance = 30; // Tło ląduje na Z = 20 (Kamera -10 + 30)
+            canvas.planeDistance = 30;
             canvas.sortingLayerName = "UI";
             canvas.sortingOrder = -100;
         }
 
-        // 2. Przeniesienie postaci
         var pSRs = playerObj.GetComponentsInChildren<SpriteRenderer>(true);
-        foreach(var sr in pSRs) {
+        foreach (var sr in pSRs)
+        {
             sr.gameObject.layer = uiLayer;
             sr.sortingLayerName = "UI";
             sr.sortingOrder = 1000;
         }
 
         var eSRs = enemyObj.GetComponentsInChildren<SpriteRenderer>(true);
-        foreach(var sr in eSRs) {
+        foreach (var sr in eSRs)
+        {
             sr.gameObject.layer = uiLayer;
             sr.sortingLayerName = "UI";
             sr.sortingOrder = 1000;
         }
 
-        // 3. Pozycjonowanie początkowe na Z = 10
         if (playerSpawnPoint != null) playerObj.transform.position = new Vector3(playerSpawnPoint.position.x, playerSpawnPoint.position.y, 10f);
         if (enemySpawnPoint != null) enemyObj.transform.position = new Vector3(enemySpawnPoint.position.x, enemySpawnPoint.position.y, 10f);
 
-        // 4. Pobranie danych i start walki
         EnemyOnMap enemyOnMap = enemyObj.GetComponent<EnemyOnMap>();
-        
-        // Szukamy fabryki: najpierw przypisana ręcznie, potem na scenie
         EnemyFactory factory = enemyFactory != null ? enemyFactory : FindFirstObjectByType<EnemyFactory>();
         PlayerManager playerManager = playerObj.GetComponent<PlayerManager>();
 
         if (factory != null && playerManager != null && enemyOnMap != null)
         {
-            Debug.Log($"CombatController: Inicjalizacja modeli dla: {enemyOnMap.databaseEnemyId}");
             Enemy enemyModel = factory.CreateEnemy(enemyOnMap.databaseEnemyId);
             Entity playerModel = playerManager.GetCombatEntity(playerManager.playerName);
-
-            if (enemyModel != null && playerModel != null)
-            {
-                SetupBattle(playerModel, enemyModel);
-                Debug.Log("CombatController: WALKA URUCHOMIONY POMYŚLNIE.");
-            }
-            else
-            {
-                Debug.LogError($"CombatController: Błąd tworzenia modeli. EnemyModel: {enemyModel != null}, PlayerModel: {playerModel != null}");
-            }
-        }
-        else
-        {
-            Debug.LogError($"CombatController: BRAK KOMPONENTÓW! Factory: {factory != null}, PlayerManager: {playerManager != null}, EnemyOnMap: {enemyOnMap != null}");
+            if (enemyModel != null && playerModel != null) SetupBattle(playerModel, enemyModel);
         }
     }
 
     public void SetupBattle(Entity player, Entity enemy)
     {
         if (player == null || enemy == null) return;
-
         _player = player;
         _enemy = enemy;
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
-
         _combatManager.OnStateChanged += (state) => {
             uiController.UpdateTurnText(state.ToString());
             if (uiController.actionMenu != null)
@@ -167,11 +135,17 @@ public class CombatController : MonoBehaviour
     private void HandleBattleEnded(BattleResult result)
     {
         uiController.ShowMessage($"Walka zakończona: {result}");
-        
-        // Zatrzymujemy wymuszanie skali, aby menedżer mógł przywrócić oryginał
+
+        if (result == BattleResult.Victory)
+        {
+            var triggers = FindFirstObjectByType<GameAchievementTriggers>();
+            if (triggers != null)
+            {
+                triggers.TriggerKillAchievement();
+            }
+        }
+
         _scalingEnforced = false;
-        
-        // Powiadomienie menedżera o zakończeniu po krótkim opóźnieniu
         StartCoroutine(EndBattleWithDelay(result == BattleResult.Victory));
     }
 
@@ -184,14 +158,9 @@ public class CombatController : MonoBehaviour
         }
     }
 
-    // --- METODY DLA PRZYCISKÓW (On Click w Unity) ---
-
     public void OnAttackButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
-        if (_player == null || _enemy == null) return;
-
-        Debug.Log("UI: Kliknięto przycisk ATAK");
         ICombatCommand attack = new AttackCommand(_player, _enemy, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
         _combatManager.ExecuteTurnAction(attack);
     }
@@ -201,12 +170,18 @@ public class CombatController : MonoBehaviour
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
         if (_player == null || _enemy == null) return;
 
-        // Pobieramy specjalną umiejętność rzutując na klasę Player
         if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
         {
             Debug.Log($"UI: Kliknięto ATAK SPECJALNY ({playerInstance.SpecialAbility.GetType().Name})");
             ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
             _combatManager.ExecuteTurnAction(special);
+
+            // --- TRIGGER: LICZNIK SPECJALI (KOLEKCJONER) ---
+            var triggers = FindFirstObjectByType<GameAchievementTriggers>();
+            if (triggers != null)
+            {
+                triggers.TriggerSpecialAchievement();
+            }
         }
         else
         {
@@ -217,9 +192,6 @@ public class CombatController : MonoBehaviour
     public void OnDefendButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
-        if (_player == null) return;
-
-        Debug.Log("UI: Kliknięto przycisk OBRONA");
         ICombatCommand defend = new DefendCommand(_player, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
         _combatManager.ExecuteTurnAction(defend);
     }
@@ -227,8 +199,6 @@ public class CombatController : MonoBehaviour
     public void OnEscapeButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
-
-        uiController.ShowMessage("Próba ucieczki...");
-        _combatManager.TryEscape(40); // 40% szansy na ucieczkę
+        _combatManager.TryEscape(40);
     }
 }
