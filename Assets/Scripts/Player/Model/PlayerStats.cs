@@ -6,10 +6,10 @@ public class PlayerStats
     public event Action<int, int> OnHealthChanged;
     public event Action<int> OnLevelUp;
     public event Action OnDeath;
-    public event Action OnStatsChanged; // <--- DODANE
+    public event Action OnStatsChanged;
 
     public int CurrentHP { get; private set; }
-    
+
     // Base stats (from level/class)
     private int _baseMaxHP;
     private int _baseAttack;
@@ -53,12 +53,11 @@ public class PlayerStats
         _bonusAttack = attack;
         _bonusDefense = defense;
         _bonusMaxHP = maxHP;
-        
-        // Ensure HP doesn't exceed new MaxHP, but keep it at its current value if it's lower
+
         if (CurrentHP > MaxHP) CurrentHP = MaxHP;
-        
+
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
-        OnStatsChanged?.Invoke(); // <--- DODANE
+        OnStatsChanged?.Invoke();
     }
 
     public void Heal(int amount)
@@ -70,8 +69,6 @@ public class PlayerStats
 
     public void TakeDamage(int damage)
     {
-        // USUNI�TO ODEJMOWANIE PANCERZA. 
-        // Obliczenia pancerza (i jego ignorowanie przez magi�) zachodz� w logice walki/strategiach.
         CurrentHP -= damage;
 
         if (CurrentHP <= 0)
@@ -98,21 +95,27 @@ public class PlayerStats
     {
         Level++;
 
-        // Bazowy przyrost statystyk przy awansie na wyszy poziom
+        // Bazowy przyrost statystyk
         _baseMaxHP += 10;
         _baseAttack += 2;
         _baseDefense += 2;
-        // Opcjonalnie mona tu rwnie zwiksza Speed: Speed += 1;
 
-        CurrentHP = MaxHP; // Pe ne leczenie przy awansie
-
+        CurrentHP = MaxHP;
         xpToNextLevel = CalculateXP();
+
+        // --- WYWOŁANIE TWOJEGO POP-UPA ---
+        // Ponieważ ta klasa nie jest MonoBehaviour, używamy pełnej ścieżki do silnika Unity
+        var triggers = UnityEngine.Object.FindFirstObjectByType<GameAchievementTriggers>();
+        if (triggers != null)
+        {
+            triggers.TriggerLevelUp();
+        }
+        // ---------------------------------
 
         OnLevelUp?.Invoke(Level);
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
-        OnStatsChanged?.Invoke(); // <--- DODANE
+        OnStatsChanged?.Invoke();
     }
-
 
     private int CalculateXP()
     {

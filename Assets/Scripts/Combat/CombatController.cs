@@ -62,11 +62,7 @@ public class CombatController : MonoBehaviour
 
     public void InitializeCombat(GameObject playerObj, GameObject enemyObj)
     {
-        if (playerObj == null || enemyObj == null)
-        {
-            Debug.LogError("CombatController: Próba startu z brakującymi obiektami postaci!");
-            return;
-        }
+        if (playerObj == null || enemyObj == null) return;
 
         _playerObj = playerObj;
         _enemyObj = enemyObj;
@@ -80,8 +76,6 @@ public class CombatController : MonoBehaviour
             combatCam = root.GetComponentInChildren<Camera>();
             if (combatCam != null) break;
         }
-
-        if (combatCam == null) Debug.LogError("CombatController: NIE ZNALEZIONO KAMERY W SCENIE WALKI!");
 
         Canvas canvas = uiController.GetComponentInParent<Canvas>();
         if (canvas != null)
@@ -120,18 +114,13 @@ public class CombatController : MonoBehaviour
         {
             Enemy enemyModel = factory.CreateEnemy(enemyOnMap.databaseEnemyId);
             Entity playerModel = playerManager.GetCombatEntity(playerManager.playerName);
-
-            if (enemyModel != null && playerModel != null)
-            {
-                SetupBattle(playerModel, enemyModel);
-            }
+            if (enemyModel != null && playerModel != null) SetupBattle(playerModel, enemyModel);
         }
     }
 
     public void SetupBattle(Entity player, Entity enemy)
     {
         if (player == null || enemy == null) return;
-
         _player = player;
         _enemy = enemy;
 
@@ -141,7 +130,6 @@ public class CombatController : MonoBehaviour
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
-
         _combatManager.OnStateChanged += (state) => {
             uiController.UpdateTurnText(state.ToString());
             if (uiController.actionMenu != null)
@@ -161,7 +149,11 @@ public class CombatController : MonoBehaviour
 
         if (result == BattleResult.Victory)
         {
-            CheckAchievementsAtVictory();
+            var triggers = FindFirstObjectByType<GameAchievementTriggers>();
+            if (triggers != null)
+            {
+                triggers.TriggerKillAchievement();
+            }
         }
 
         _scalingEnforced = false;
@@ -222,10 +214,19 @@ public class CombatController : MonoBehaviour
     public void OnSpecialAttackButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
+        if (_player == null || _enemy == null) return;
+
         if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
         {
             ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
             _combatManager.ExecuteTurnAction(special);
+
+            // --- TRIGGER: LICZNIK SPECJALI (KOLEKCJONER) ---
+            var triggers = FindFirstObjectByType<GameAchievementTriggers>();
+            if (triggers != null)
+            {
+                triggers.TriggerSpecialAchievement();
+            }
         }
     }
 
@@ -239,7 +240,6 @@ public class CombatController : MonoBehaviour
     public void OnEscapeButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
-        uiController.ShowMessage("Próba ucieczki...");
         _combatManager.TryEscape(40);
     }
 }
