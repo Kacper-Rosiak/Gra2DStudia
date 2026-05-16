@@ -20,6 +20,10 @@ public class CombatController : MonoBehaviour
     [SerializeField] private string characterSortingLayer = "Default";
     [SerializeField] private string backgroundSortingLayer = "Background";
 
+    // --- ZMIENNE DLA OSIĄGNIĘĆ ---
+    private int _initialPlayerHP;
+    private bool _playerTookDamageThisCombat = false;
+
     private CombatManager _combatManager;
     private Entity _player;
     private Entity _enemy;
@@ -120,12 +124,19 @@ public class CombatController : MonoBehaviour
         _player = player;
         _enemy = enemy;
 
+        // [ACHIEVEMENT] Zapamiętujemy startowe HP do sprawdzania obrażeń
+        _initialPlayerHP = _player.CurrentHealth;
+        _playerTookDamageThisCombat = false;
+
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
         _combatManager.OnStateChanged += (state) => {
             uiController.UpdateTurnText(state.ToString());
             if (uiController.actionMenu != null)
                 uiController.actionMenu.SetActive(state == BattleState.PlayerTurn);
+
+            // [ACHIEVEMENT] Sprawdzanie czy gracz otrzymał obrażenia po każdym stanie
+            if (_player.CurrentHealth < _initialPlayerHP) _playerTookDamageThisCombat = true;
         };
 
         uiController.InitializeUI(_player, _enemy);
@@ -147,6 +158,41 @@ public class CombatController : MonoBehaviour
 
         _scalingEnforced = false;
         StartCoroutine(EndBattleWithDelay(result == BattleResult.Victory));
+    }
+
+    // --- LOGIKA OSIĄGNIĘĆ PRZY ZWYCIĘSTWIE ---
+    private void CheckAchievementsAtVictory()
+    {
+        // 1. Ogólny sygnał wygranej walki (dla Mistrz Areny)
+        GameEvents.OnCombatsWon?.Invoke();
+
+        // 2. Sygnał zabicia wroga (dla Pierwsza Krew i Łowca Potworów)
+        GameEvents.OnEnemyKilled?.Invoke();
+
+        // 3. Sprawdzenie czy to był Boss (dla Pogromca Bossów)
+        if (_enemy is Enemy e && e.IsBoss) // Zakładam, że w klasie Enemy masz pole IsBoss
+        {
+            GameEvents.OnBossKilled?.Invoke();
+
+            // [ACHIEVEMENT] Boss Slayer / Mistrz Uników (bez obrażeń)
+            if (!_playerTookDamageThisCombat)
+            {
+                AchievementBootstrapper.Instance.Achievements.UnlockAchievement("BOSS_NO_DMG");
+                AchievementBootstrapper.Instance.Achievements.UnlockAchievement("EVADE_MASTER");
+            }
+        }
+
+        // 4. [ACHIEVEMENT] Nietykalny (wygrana zwykłej walki bez obrażeń)
+        if (!_playerTookDamageThisCombat)
+        {
+            AchievementBootstrapper.Instance.Achievements.UnlockAchievement("UNTOUCHABLE");
+        }
+
+        // 5. [ACHIEVEMENT] Last Pixel (wygrana z dokładnie 1 HP)
+        if (_player.CurrentHealth == 1)
+        {
+            AchievementBootstrapper.Instance.Achievements.UnlockAchievement("LAST_PIXEL");
+        }
     }
 
     private System.Collections.IEnumerator EndBattleWithDelay(bool won)
@@ -172,7 +218,6 @@ public class CombatController : MonoBehaviour
 
         if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
         {
-            Debug.Log($"UI: Kliknięto ATAK SPECJALNY ({playerInstance.SpecialAbility.GetType().Name})");
             ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
             _combatManager.ExecuteTurnAction(special);
 
@@ -182,10 +227,6 @@ public class CombatController : MonoBehaviour
             {
                 triggers.TriggerSpecialAchievement();
             }
-        }
-        else
-        {
-            uiController.ShowMessage("<color=green>[Akcja gracza]</color> Ta postać nie posiada umiejętności specjalnej!");
         }
     }
 
