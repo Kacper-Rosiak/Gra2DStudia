@@ -117,4 +117,21 @@ public class AchievementManager
     {
         return _progressMap;
     }
+
+    public void UnlockAchievement(string achievementId)
+    {
+        if (_progressMap.TryGetValue(achievementId, out var progress))
+        {
+            if (!progress.isUnlocked)
+            {
+                var definition = _database.FirstOrDefault(a => a.id == achievementId);
+                if (definition != null)
+                {
+                    progress.currentValue = definition.requiredValue;
+                    progress.isUnlocked = true;
+                    OnAchievementUnlocked?.Invoke(definition);
+                }
+            }
+        }
+    }
 }

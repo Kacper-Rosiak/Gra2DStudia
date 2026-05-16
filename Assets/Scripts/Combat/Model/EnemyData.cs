@@ -10,5 +10,7 @@ public class EnemyData : ScriptableObject
     public int defense;
     public int speed;
 
+    public bool isBoss;
+
     public int xpReward;
 }

@@ -15,11 +15,6 @@ public class CombatController : MonoBehaviour
     [SerializeField] private float playerScale = 120f;
     [SerializeField] private float enemyScale = 100f;
 
-    [Header("Warstwy i Widoczność")]
-    [SerializeField] private int combatSortingOrder = 10000;
-    [SerializeField] private string characterSortingLayer = "Default";
-    [SerializeField] private string backgroundSortingLayer = "Background";
-
     // --- ZMIENNE DLA OSIĄGNIĘĆ ---
     private int _initialPlayerHP;
     private bool _playerTookDamageThisCombat = false;
@@ -125,7 +120,7 @@ public class CombatController : MonoBehaviour
         _enemy = enemy;
 
         // [ACHIEVEMENT] Zapamiętujemy startowe HP do sprawdzania obrażeń
-        _initialPlayerHP = _player.CurrentHealth;
+        _initialPlayerHP = _player.CurrentHP;
         _playerTookDamageThisCombat = false;
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
@@ -136,7 +131,7 @@ public class CombatController : MonoBehaviour
                 uiController.actionMenu.SetActive(state == BattleState.PlayerTurn);
 
             // [ACHIEVEMENT] Sprawdzanie czy gracz otrzymał obrażenia po każdym stanie
-            if (_player.CurrentHealth < _initialPlayerHP) _playerTookDamageThisCombat = true;
+            if (_player.CurrentHP < _initialPlayerHP) _playerTookDamageThisCombat = true;
         };
 
         uiController.InitializeUI(_player, _enemy);
@@ -154,6 +149,8 @@ public class CombatController : MonoBehaviour
             {
                 triggers.TriggerKillAchievement();
             }
+
+            CheckAchievementsAtVictory();
         }
 
         _scalingEnforced = false;
@@ -164,15 +161,15 @@ public class CombatController : MonoBehaviour
     private void CheckAchievementsAtVictory()
     {
         // 1. Ogólny sygnał wygranej walki (dla Mistrz Areny)
-        GameEvents.OnCombatsWon?.Invoke();
+        GameEvents.TriggerCombatWon();
 
         // 2. Sygnał zabicia wroga (dla Pierwsza Krew i Łowca Potworów)
-        GameEvents.OnEnemyKilled?.Invoke();
+        GameEvents.TriggerEnemyKilled();
 
         // 3. Sprawdzenie czy to był Boss (dla Pogromca Bossów)
         if (_enemy is Enemy e && e.IsBoss) // Zakładam, że w klasie Enemy masz pole IsBoss
         {
-            GameEvents.OnBossKilled?.Invoke();
+            GameEvents.TriggerBossKilled();
 
             // [ACHIEVEMENT] Boss Slayer / Mistrz Uników (bez obrażeń)
             if (!_playerTookDamageThisCombat)
@@ -189,7 +186,7 @@ public class CombatController : MonoBehaviour
         }
 
         // 5. [ACHIEVEMENT] Last Pixel (wygrana z dokładnie 1 HP)
-        if (_player.CurrentHealth == 1)
+        if (_player.CurrentHP == 1)
         {
             AchievementBootstrapper.Instance.Achievements.UnlockAchievement("LAST_PIXEL");
         }

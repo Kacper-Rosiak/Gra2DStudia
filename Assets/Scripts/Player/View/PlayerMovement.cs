@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveinput;
     private Animator animator;
 
-    private bool isFacingRight = true;
     private SpriteRenderer spriteRenderer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,17 +41,17 @@ public class PlayerMovement : MonoBehaviour
     }
     private void FlipSprite()
     {
-        // Jeœli wartoœæ x jest na minusie (idziemy w lewo), w³¹czamy odwrócenie
+        // Jeï¿½li wartoï¿½ï¿½ x jest na minusie (idziemy w lewo), wï¿½ï¿½czamy odwrï¿½cenie
         if (moveinput.x < 0f)
         {
             spriteRenderer.flipX = true;
         }
-        // Jeœli wartoœæ x jest na plusie (idziemy w prawo), wy³¹czamy odwrócenie
+        // Jeï¿½li wartoï¿½ï¿½ x jest na plusie (idziemy w prawo), wyï¿½ï¿½czamy odwrï¿½cenie
         else if (moveinput.x > 0f)
         {
             spriteRenderer.flipX = false;
         }
-        // Jeœli moveinput.x wynosi 0 (idziemy tylko w górê/dó³ lub stoimy), 
-        // nie robimy nic – postaæ zostaje odwrócona tak, jak ostatnio.
+        // Jeï¿½li moveinput.x wynosi 0 (idziemy tylko w gï¿½rï¿½/dï¿½ lub stoimy), 
+        // nie robimy nic ï¿½ postaï¿½ zostaje odwrï¿½cona tak, jak ostatnio.
     }
 }

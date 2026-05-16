@@ -5,6 +5,7 @@ public class Enemy : Entity
 {
     public string EnemyId { get; private set; }
     public int XPReward { get; private set; }
+    public bool IsBoss { get; private set; }
 
     public event Action<int> OnEnemyDeath;
 
@@ -20,6 +21,7 @@ public class Enemy : Entity
         Defense = data.defense;
         Speed = data.speed;
         XPReward = data.xpReward;
+        IsBoss = data.isBoss;
 
         // DodgeChance pozostaje domylnie na 0, bo nie zmieniamy go w konstruktorze
     }

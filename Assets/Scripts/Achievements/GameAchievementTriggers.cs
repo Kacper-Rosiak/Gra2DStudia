@@ -11,7 +11,6 @@ public class GameAchievementTriggers : MonoBehaviour
 
     // Statyki, aby osiągnięcia odblokowały się tylko raz na całą sesję gry
     private static bool unlockedKill = false;
-    private static bool unlockedLevelUp = false;
     private static bool unlockedSpecial = false;
 
     private int specialUseCount = 0;

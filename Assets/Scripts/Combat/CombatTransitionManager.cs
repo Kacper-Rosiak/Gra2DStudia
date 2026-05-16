@@ -9,7 +9,6 @@ public class CombatTransitionManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private string combatSceneName = "CombatScene";
-    [SerializeField] private float fadeDuration = 0.5f;
 
     private GameObject _player;
     private GameObject _enemy;
