@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum AchievementType
+public enum AchievementCategory
 {
     KillCount, LevelReach, BossKills, DeathCount,
     CraftCount, PotionCount, ItemsSold, QuestsDone,
@@ -8,11 +8,11 @@ public enum AchievementType
 }
 
 [CreateAssetMenu(fileName = "NewAchievement", menuName = "Systems/Achievement")]
-public class AchievementData : ScriptableObject
+public class AchievementDefinition : ScriptableObject
 {
     public string id;
     public string displayName;
     public string description;
-    public AchievementType type;
+    public AchievementCategory type;
     public int requiredValue;
 }
