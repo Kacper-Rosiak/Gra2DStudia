@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    [Header("Databases")]
+    public ItemDatabase gameDatabase;
+
     public PlayerClassData SelectedClassData { get; set; }
 
     private void Awake()

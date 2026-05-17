@@ -26,7 +26,23 @@ public class PlayerSpawner : MonoBehaviour
         GameObject existingPlayer = GameObject.FindGameObjectWithTag(playerTag);
         if (existingPlayer != null) return existingPlayer;
 
-        PlayerClassData classToSpawn = GameManager.Instance.SelectedClassData;
+        PlayerClassData classToSpawn = null;
+
+        // Jeśli wczytujemy grę, szukamy klasy zapisanej w pliku
+        if (SaveManager.CurrentSaveData != null && !string.IsNullOrEmpty(SaveManager.CurrentSaveData.className))
+        {
+            if (GameManager.Instance.gameDatabase != null)
+            {
+                classToSpawn = GameManager.Instance.gameDatabase.GetClassByName(SaveManager.CurrentSaveData.className);
+            }
+        }
+
+        // Jeśli nie wczytujemy zapisu lub nie znaleziono klasy, bierzemy wybraną w menu
+        if (classToSpawn == null)
+        {
+            classToSpawn = GameManager.Instance.SelectedClassData;
+        }
+
         if (classToSpawn == null) classToSpawn = fallbackClass;
 
         if (classToSpawn != null && classToSpawn.classPrefab != null)
