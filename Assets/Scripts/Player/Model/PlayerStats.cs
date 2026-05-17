@@ -117,6 +117,27 @@ public class PlayerStats
         OnStatsChanged?.Invoke();
     }
 
+    public void LoadStats(int level, int xp, int hp)
+    {
+        Level = level;
+        CurrentXP = xp;
+        
+        // Recalculate base stats based on level
+        // Assuming 10 HP, 2 Attack, 2 Defense per level (starting from lvl 1)
+        int levelsGained = Level - 1;
+        _baseMaxHP += levelsGained * 10;
+        _baseAttack += levelsGained * 2;
+        _baseDefense += levelsGained * 2;
+        
+        xpToNextLevel = CalculateXP();
+        
+        CurrentHP = hp;
+        if (CurrentHP > MaxHP) CurrentHP = MaxHP;
+
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+        OnStatsChanged?.Invoke();
+    }
+
     private int CalculateXP()
     {
         return 100 + Level * 50;

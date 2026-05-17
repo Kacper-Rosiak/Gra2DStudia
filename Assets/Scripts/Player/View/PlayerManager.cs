@@ -8,6 +8,9 @@ public class PlayerManager : MonoBehaviour
     [Header("Player Profile (Data-Driven)")]
     public PlayerClassData startingClass; // <--- DODANE: Referencja do danych z edytora Unity
 
+    [Header("Save System")]
+    public ItemDatabase itemDatabase;
+
     public PlayerStats Stats { get; private set; }
     public Inventory Inventory { get; private set; }
     public Equipment Equipment { get; private set; }
@@ -25,7 +28,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        
+
 
         // 1. Inicjalizacja statystyk na podstawie podpitych danych z edytora
         if (startingClass != null)
@@ -38,9 +41,57 @@ public class PlayerManager : MonoBehaviour
 
         else
         {
-            Debug.LogError("Brak przypisanej klasy postaci w PlayerManager! Przeci�gnij PlayerClassData do Inspektora.");
+            Debug.LogError("Brak przypisanej klasy postaci w PlayerManager! Przecignij PlayerClassData do Inspektora.");
         }
     }
+
+    private void Start()
+    {
+        // 2. Wczytywanie zapisu jeśli istnieje
+        if (SaveManager.CurrentSaveData != null)
+        {
+            LoadFromSave(SaveManager.CurrentSaveData);
+            SaveManager.CurrentSaveData = null; // Czyścimy po wczytaniu
+        }
+        else
+        {
+            // Nowa gra - pobierz imię z GameManager jeśli zostało wpisane
+            if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.SelectedPlayerName))
+            {
+                playerName = GameManager.Instance.SelectedPlayerName;
+                Debug.Log($"Nowa gra rozpoczęta jako: {playerName}");
+            }
+        }
+    }
+
+    private void LoadFromSave(SaveData data)
+    {
+        playerName = data.playerName;
+        transform.position = data.playerPosition;
+
+        // Przywracanie statystyk
+        Stats.LoadStats(data.level, data.currentXP, data.currentHP);
+        Inventory.AddGold(data.gold); // Inventory startuje z 0 gold, więc dodajemy wczytany
+
+        // Przywracanie ekwipunku
+        if (itemDatabase != null)
+        {
+            foreach (string id in data.inventoryItemIDs)
+            {
+                ItemData item = itemDatabase.GetItemByID(id);
+                if (item != null) Inventory.AddItem(item);
+            }
+
+            foreach (string id in data.equippedItemIDs)
+            {
+                ItemData item = itemDatabase.GetItemByID(id);
+                if (item != null) Equipment.EquipItem(item);
+            }
+        }
+
+        Debug.Log($"Wczytano postęp gracza: {playerName}, Level: {data.level}");
+    }
+
 
     private void OnEnable()
     {
