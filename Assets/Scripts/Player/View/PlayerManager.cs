@@ -53,6 +53,15 @@ public class PlayerManager : MonoBehaviour
             LoadFromSave(SaveManager.CurrentSaveData);
             SaveManager.CurrentSaveData = null; // Czyścimy po wczytaniu
         }
+        else
+        {
+            // Nowa gra - pobierz imię z GameManager jeśli zostało wpisane
+            if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.SelectedPlayerName))
+            {
+                playerName = GameManager.Instance.SelectedPlayerName;
+                Debug.Log($"Nowa gra rozpoczęta jako: {playerName}");
+            }
+        }
     }
 
     private void LoadFromSave(SaveData data)

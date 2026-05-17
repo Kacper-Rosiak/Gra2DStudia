@@ -42,6 +42,13 @@ public class InGameSaveMenuController : MonoBehaviour
         }
     }
 
+    public void QuitToMainMenu()
+    {
+        Debug.Log("Powrót do menu głównego...");
+        Time.timeScale = 1f; // Upewnij się, że czas płynie normalnie przed zmianą sceny
+        SceneManager.LoadScene(0); // Scena 0 to zazwyczaj MenuGlowne
+    }
+
     private async void OnSlotSelected(int slot)
     {
         if (_playerManager == null)

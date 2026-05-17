@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     public ItemDatabase gameDatabase;
 
     public PlayerClassData SelectedClassData { get; set; }
+    public string SelectedPlayerName { get; set; }
 
     private void Awake()
     {
