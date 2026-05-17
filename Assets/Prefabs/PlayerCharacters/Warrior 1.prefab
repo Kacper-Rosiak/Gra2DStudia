@@ -160,6 +160,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
   playerName: Bohater
   startingClass: {fileID: 11400000, guid: 63c54c4e05360f24e9afd4ca9f5b7d53, type: 2}
+  itemDatabase: {fileID: 11400000, guid: e6cb9ea2afe429b4c921a0732a593c9c, type: 2}
   inventoryCapacity: 24
 --- !u!114 &2461522275269266963
 MonoBehaviour:

@@ -17,30 +17,35 @@ public class MainMenuController : MonoBehaviour
 
     void Start()
     {
-        // Tworzymy instancjê naszej logiki z pierwszego skryptu
+        // Tworzymy instancjÄ™ naszej logiki
         saveManager = new SaveManager();
 
-        // Podpinamy funkcje pod klikniêcia
+        // Podpinamy funkcje pod klikniÄ™cia
         btnContinue.onClick.AddListener(OnContinueClick);
         btnNewGame.onClick.AddListener(OnNewGameClick);
         btnLoadGame.onClick.AddListener(OnLoadGameClick);
         btnQuit.onClick.AddListener(OnQuitClick);
 
-        // Zabezpieczenie z treœci zadania: Wygaszamy przycisk, jeœli brak zapisów
-        if (!saveManager.HasAnySave())
-        {
-            btnContinue.interactable = false;
-            // Opcjonalnie blokujemy te¿ menu wczytywania, bo i tak jest puste
-            btnLoadGame.interactable = false;
-        }
+        // Przycisk kontynuacji jest dostÄ™pny tylko gdy istnieje jakikolwiek zapis
+        btnContinue.interactable = saveManager.HasAnySave();
+
+        // Przycisk wczytywania (widoku 3 slotÃ³w) jest zawsze dostÄ™pny zgodnie z planem
+        btnLoadGame.interactable = true; 
     }
 
     void OnContinueClick()
     {
         saveManager.LoadLatestSave();
-        // £aduje scenê "Obozowisko" asynchronicznie (ma indeks 1 w Build Profiles)
-        SceneManager.LoadSceneAsync(1);
+
+        if (SaveManager.CurrentSaveData != null)
+        {
+            string sceneToLoad = SaveManager.CurrentSaveData.sceneName;
+            if (string.IsNullOrEmpty(sceneToLoad)) sceneToLoad = "CampScene"; // Fallback
+
+            SceneManager.LoadSceneAsync(sceneToLoad);
+        }
     }
+
 
     void OnNewGameClick()
     {
@@ -50,7 +55,7 @@ public class MainMenuController : MonoBehaviour
 
     void OnLoadGameClick()
     {
-        // W³¹cza ten ukryty panel
+        // Wï¿½ï¿½cza ten ukryty panel
         loadGamePanel.SetActive(true);
     }
 
