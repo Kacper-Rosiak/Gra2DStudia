@@ -3,34 +3,30 @@ using System.Collections;
 
 public class SpikeTrap : MonoBehaviour
 {
-    public enum TrapState { Safe, Warning, Active }
+    public enum TrapState { Safe, Warning, Active, Cooldown }
 
-    [Header("Trap Timing")]
-    [Tooltip("Jak d³ugo kolce s¹ ca³kowicie schowane pod ziemi¹")]
-    [SerializeField] private float safeDuration = 3f;
+    [Header("Trap Timing (Zsynchronizowane z Animatorem)")]
+    [SerializeField] private float safeDuration = 3f;       // Kolce ca³kowicie schowane
+    [SerializeField] private float warningDuration = 1f;    // Czubki drgaj¹ / ostrze¿enie
+    [SerializeField] private float activeDuration = 0.4f;   // Krótki u³amek sekundy na cios
+    [SerializeField] private float cooldownDuration = 1.2f; // Sterczenie kolców przed opadniêciem
 
-    [Tooltip("Jak d³ugo trwa ostrze¿enie przed wybuchem (drganie czubków)")]
-    [SerializeField] private float warningDuration = 1f;
+    [Header("Direct Damage")]
+    [SerializeField] private int spikeDamage = 15;          // Obra¿enia za nadepniêcie
 
-    [Tooltip("Jak krótko trwa sam cios (tylko w tym u³amku sekundy gracz dostaje obra¿enia!)")]
-    [SerializeField] private float activeDuration = 0.4f;
-
-    [Tooltip("NOWOŒÆ: Jak d³ugo po ciosie kolce stercz¹ jeszcze z ziemi, bêd¹c ju¿ CA£KOWICIE BEZPIECZNYMI")]
-    [SerializeField] private float cooldownDuration = 1.2f;
-
-    [Header("Damage Settings")]
-    [SerializeField] private int damageAmount = 10;
-    [SerializeField] private float damageInterval = 0.5f;
+    [Header("Bleed & Slow Settings (Efekty Kolców)")]
+    [SerializeField] private float bleedDuration = 4f;
+    [SerializeField] private int bleedDamagePerTick = 4;
+    [SerializeField] private float bleedTickInterval = 0.8f;
+    [SerializeField] private float slowMultiplier = 0.5f;
 
     [Header("References")]
     [SerializeField] private Animator animator;
 
     private TrapState _currentState = TrapState.Safe;
-    private bool _isPlayerOnTrap = false;
+    private bool _isPlayerInTrap = false;
     private PlayerManager _playerManager;
-
     private bool _hasDealtDamageThisCycle = false;
-    private float _damageTimer = 0f;
 
     private void Start()
     {
@@ -40,54 +36,51 @@ public class SpikeTrap : MonoBehaviour
 
     private void Update()
     {
-        // Jeœli faza aktywnego ciosu trwa odrobinê d³u¿ej i gracz na niej stoi, dostanie kolejne ciosy w interwale
-        if (_isPlayerOnTrap && _currentState == TrapState.Active && _playerManager != null)
+        if (_isPlayerInTrap && _currentState == TrapState.Active && !_hasDealtDamageThisCycle)
         {
-            _damageTimer += Time.deltaTime;
-            if (_damageTimer >= damageInterval)
-            {
-                DealDamageToPlayer();
-                _damageTimer = 0f;
-            }
+            TryDealSpikeDamage();
         }
     }
 
     private IEnumerator TrapLoop()
     {
+        // Czekamy dok³adnie 1 klatkê przed rozpoczêciem pêtli dla stabilizacji warstw Unity 6
+        yield return null;
+
         while (true)
         {
-            // 1. FAZA: CA£KOWICIE SCHOWANE (Bezpieczne, czysta pod³oga peaks_3)
+            // 1. SAFE (Schowane kolce - POPRAWIONA NAZWA ANIMACJI)
             _currentState = TrapState.Safe;
-            _hasDealtDamageThisCycle = false;
-            _damageTimer = 0f;
-            if (animator != null) animator.Play("Trap_Safe");
+            SafePlayAnimation("Trap_Safe");
             yield return new WaitForSeconds(safeDuration);
 
-            // 2. FAZA: OSTRZE¯ENIE (Bezpieczne, czubki peaks_4 pulsuj¹)
+            // 2. WARNING (Ostrze¿enie)
             _currentState = TrapState.Warning;
-            if (animator != null) animator.Play("Trap_Warning");
+            SafePlayAnimation("Trap_Warning");
             yield return new WaitForSeconds(warningDuration);
 
-            // 3. FAZA: ATAK (NIEBEZPIECZNE! Kolce wyskakuj¹ na maksa peaks_1 i rani¹)
+            // 3. ACTIVE (Wyskoczenie - zadawanie obra¿eñ)
             _currentState = TrapState.Active;
-            if (animator != null) animator.Play("Trap_Active");
+            _hasDealtDamageThisCycle = false;
+            SafePlayAnimation("Trap_Active");
 
-            // Natychmiastowy cios, jeœli gracz sta³ na pu³apce w u³amku sekundy aktywacji
-            if (_isPlayerOnTrap && !_hasDealtDamageThisCycle)
+            if (_isPlayerInTrap)
             {
-                DealDamageToPlayer();
-                _damageTimer = 0f;
+                TryDealSpikeDamage();
             }
             yield return new WaitForSeconds(activeDuration);
 
-            // 4. FAZA: OPADANIE / COOLDOWN (WIZUALNY EFEKT – CA£KOWICIE BEZPIECZNE!)
-            _currentState = TrapState.Safe; // KLUCZ: Zmieniamy stan na Safe! Kod obra¿eñ ignoruje teraz gracza.
-            _hasDealtDamageThisCycle = false;
-
-            // Wymuszamy odtworzenie klatki peaks_4 (czubków), ¿eby kolce klimatycznie stercza³y po ataku
-            if (animator != null) animator.Play("Trap_Warning");
-
+            // 4. COOLDOWN (Wysuniête, ale ju¿ bezpieczne)
+            _currentState = TrapState.Cooldown;
             yield return new WaitForSeconds(cooldownDuration);
+        }
+    }
+
+    private void SafePlayAnimation(string stateName)
+    {
+        if (animator != null && animator.runtimeAnimatorController != null && animator.layerCount > 0)
+        {
+            animator.Play(stateName);
         }
     }
 
@@ -95,14 +88,12 @@ public class SpikeTrap : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            _isPlayerOnTrap = true;
+            _isPlayerInTrap = true;
             _playerManager = collision.GetComponent<PlayerManager>();
 
-            // Gracz dostanie obra¿enia tylko wtedy, gdy wejdzie w trakcie trwania w³aœciwej fazy Active
-            if (_currentState == TrapState.Active && !_hasDealtDamageThisCycle)
+            if (_currentState == TrapState.Active)
             {
-                DealDamageToPlayer();
-                _damageTimer = 0f;
+                TryDealSpikeDamage();
             }
         }
     }
@@ -111,18 +102,19 @@ public class SpikeTrap : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            _isPlayerOnTrap = false;
+            _isPlayerInTrap = false;
             _playerManager = null;
         }
     }
 
-    private void DealDamageToPlayer()
+    private void TryDealSpikeDamage()
     {
-        if (_playerManager != null)
+        if (_playerManager != null && !_hasDealtDamageThisCycle)
         {
             _hasDealtDamageThisCycle = true;
-            // _playerManager.TakeDamage(damageAmount); 
-            Debug.Log($"<color=red>[PU£APKA]</color> Gracz otrzyma³ obra¿enia w fazie AKTYWNEJ kolców!");
+            _playerManager.TakeDamage(spikeDamage);
+            _playerManager.ApplyBleedAndSlow(bleedDuration, bleedDamagePerTick, bleedTickInterval, slowMultiplier);
+            Debug.Log("<color=red>[PU£APKA]</color> Gracz otrzyma³ obra¿enia w fazie AKTYWNEJ kolców!");
         }
     }
 }

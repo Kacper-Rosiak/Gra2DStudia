@@ -156,8 +156,11 @@ MonoBehaviour:
   warningDuration: 1
   activeDuration: 0.3
   cooldownDuration: 1.2
-  damageAmount: 10
-  damageInterval: 0.5
+  spikeDamage: 15
+  bleedDuration: 4
+  bleedDamagePerTick: 4
+  bleedTickInterval: 0.8
+  slowMultiplier: 0.5
   animator: {fileID: 0}
 --- !u!95 &3809974153245243228
 Animator:
@@ -169,7 +172,7 @@ Animator:
   m_GameObject: {fileID: 8875619433371122505}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0c94254232dc87f4b95836d492019841, type: 2}
+  m_Controller: {fileID: 9100000, guid: 3cfb7cd018026ef4bb0fd5532c0a0fba, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
