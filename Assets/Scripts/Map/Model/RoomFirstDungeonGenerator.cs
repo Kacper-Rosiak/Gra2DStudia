@@ -27,20 +27,40 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
     [SerializeField] private float minDistanceBetweenTorches = 4f;
 
     [Header("PCG - Floor Props")]
-    [Tooltip("Lista prefabów dekoracji (np. kamienie Dungeon_Tileset_59, kości Dungeon_Tileset_77)")]
     [SerializeField] private List<GameObject> floorDecorationPrefabs;
-
-    [Tooltip("Minimalna liczba dekoracji w KAŻDYM pomieszczeniu")]
     [SerializeField] private int minDecorationsPerRoom = 3;
-
-    [Tooltip("Maksymalna liczba dekoracji w pomieszczeniu")]
     [SerializeField] private int maxDecorationsPerRoom = 6;
-
-    [Tooltip("Maksymalna odległość od ściany lochu (kratki), w jakiej mogą powstać dekoracje")]
     [SerializeField] private int maxDecorationsDistanceFromWall = 2;
-
-    [Tooltip("Minimalny dystans w kratkach pomiędzy dwiema dekoracjami w tym samym pokoju")]
     [SerializeField] private float minDistanceBetweenDecorations = 5f;
+
+    [Header("PCG - Traps")]
+    [SerializeField] private GameObject trapPrefab;
+    [SerializeField] private int maxTrapsPerRoom = 2;
+    [SerializeField][Range(0f, 1f)] private float trapSpawnChance = 0.5f;
+    [SerializeField] private float minDistanceBetweenTraps = 3.5f;
+
+    // --- NOWA, PEŁNA KONTROLA NAD MIOTACZAMI W INSPEKTORZE ---
+    [Header("PCG - Wall Flamethrowers")]
+    [SerializeField] private GameObject topFlamethrowerPrefab;
+    [SerializeField] private GameObject sideFlamethrowerPrefab;
+    [SerializeField][Range(0f, 1f)] private float flamethrowerSpawnChance = 0.15f;
+    [SerializeField] private float minDistanceBetweenFlamethrowers = 5f;
+    [SerializeField] private bool spawnFlamethrowersOnlyInCorridors = true;
+
+    [Tooltip("Przesunięcie w pionie dla górnego miotacza")]
+    [SerializeField][Range(-1f, 1f)] private float topFlamethrowerYOffset = -0.2f;
+
+    [Tooltip("Przesunięcie w poziomie dla LEWEJ ściany (wypchnięcie w stronę korytarza)")]
+    [SerializeField][Range(-1f, 1f)] private float leftWallXOffset = 0.4f;
+    [Tooltip("Zaznacz, jeśli miotacz na LEWEJ ścianie patrzy w złą stronę")]
+    [SerializeField] private bool flipLeftWall = false;
+
+    [Tooltip("Przesunięcie w poziomie dla PRAWEJ ściany (wypchnięcie w stronę korytarza)")]
+    [SerializeField][Range(-1f, 1f)] private float rightWallXOffset = -0.4f;
+    [Tooltip("Zaznacz, jeśli miotacz na PRAWEJ ścianie patrzy w złą stronę")]
+    [SerializeField] private bool flipRightWall = true;
+
+    private HashSet<Vector2Int> _occupiedWallPositions = new HashSet<Vector2Int>();
 
     protected override void RunProceduralGeneration()
     {
@@ -51,6 +71,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 DestroyImmediate(entityParent.GetChild(i).gameObject);
             }
         }
+        _occupiedWallPositions.Clear();
         CreateRooms();
     }
 
@@ -78,7 +99,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             }
 
             GameObject player = GameObject.FindGameObjectWithTag("Player");
-
             if (player == null && PlayerSpawner.Instance != null)
             {
                 player = PlayerSpawner.Instance.SpawnPlayer();
@@ -87,16 +107,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             if (player != null)
             {
                 Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-                if (rb != null)
-                {
-                    rb.position = startRoomCenterPos;
-                }
+                if (rb != null) rb.position = startRoomCenterPos;
                 player.transform.position = startRoomCenterPos;
-
-                if (PlayerSpawner.Instance != null)
-                {
-                    PlayerSpawner.Instance.AssignCamera(player);
-                }
+                if (PlayerSpawner.Instance != null) PlayerSpawner.Instance.AssignCamera(player);
             }
         }
 
@@ -108,7 +121,79 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         tilemapVisualizer.CompressAllBounds();
 
         PopulateRooms(roomsList, floor, corridors);
+        SpawnWallFlamethrowers(floor, corridors);
         SpawnTorches(floor);
+    }
+
+    private void SpawnWallFlamethrowers(HashSet<Vector2Int> floorPositions, HashSet<Vector2Int> corridorsPositions)
+    {
+        if (topFlamethrowerPrefab == null && sideFlamethrowerPrefab == null) return;
+
+        List<Vector2Int> spawnedFlamethrowers = new List<Vector2Int>();
+        IEnumerable<Vector2Int> positionsToEvaluate = spawnFlamethrowersOnlyInCorridors ? corridorsPositions : floorPositions;
+
+        foreach (Vector2Int pos in positionsToEvaluate)
+        {
+            if (Random.value > flamethrowerSpawnChance) continue;
+
+            // 1. ŚCIANA GÓRNA (Strzał w dół)
+            if (topFlamethrowerPrefab != null && !floorPositions.Contains(pos + Vector2Int.up))
+            {
+                Vector2Int targetWallPos = pos + Vector2Int.up;
+                if (!_occupiedWallPositions.Contains(targetWallPos) && !IsTooCloseToOthers(targetWallPos, spawnedFlamethrowers))
+                {
+                    Vector3 spawnPos = new Vector3(targetWallPos.x + 0.5f, targetWallPos.y + 0.5f + topFlamethrowerYOffset, 0f);
+                    Instantiate(topFlamethrowerPrefab, spawnPos, Quaternion.identity, entityParent);
+
+                    spawnedFlamethrowers.Add(targetWallPos);
+                    _occupiedWallPositions.Add(targetWallPos);
+                    continue;
+                }
+            }
+
+            // 2. ŚCIANA LEWA (Miotacz po lewej stronie korytarza, strzał w prawo)
+            if (sideFlamethrowerPrefab != null && !floorPositions.Contains(pos + Vector2Int.left))
+            {
+                Vector2Int targetWallPos = pos + Vector2Int.left;
+                if (!_occupiedWallPositions.Contains(targetWallPos) && !IsTooCloseToOthers(targetWallPos, spawnedFlamethrowers))
+                {
+                    Vector3 spawnPos = new Vector3(targetWallPos.x + 0.5f + leftWallXOffset, targetWallPos.y + 0.5f, 0f);
+                    GameObject ftObj = Instantiate(sideFlamethrowerPrefab, spawnPos, Quaternion.identity, entityParent);
+
+                    ftObj.transform.localScale = new Vector3(flipLeftWall ? -1f : 1f, 1f, 1f);
+
+                    spawnedFlamethrowers.Add(targetWallPos);
+                    _occupiedWallPositions.Add(targetWallPos);
+                    continue;
+                }
+            }
+
+            // 3. ŚCIANA PRAWA (Miotacz po prawej stronie korytarza, strzał w lewo)
+            if (sideFlamethrowerPrefab != null && !floorPositions.Contains(pos + Vector2Int.right))
+            {
+                Vector2Int targetWallPos = pos + Vector2Int.right;
+                if (!_occupiedWallPositions.Contains(targetWallPos) && !IsTooCloseToOthers(targetWallPos, spawnedFlamethrowers))
+                {
+                    Vector3 spawnPos = new Vector3(targetWallPos.x + 0.5f + rightWallXOffset, targetWallPos.y + 0.5f, 0f);
+                    GameObject ftObj = Instantiate(sideFlamethrowerPrefab, spawnPos, Quaternion.identity, entityParent);
+
+                    ftObj.transform.localScale = new Vector3(flipRightWall ? -1f : 1f, 1f, 1f);
+
+                    spawnedFlamethrowers.Add(targetWallPos);
+                    _occupiedWallPositions.Add(targetWallPos);
+                    continue;
+                }
+            }
+        }
+    }
+
+    private bool IsTooCloseToOthers(Vector2Int targetPos, List<Vector2Int> spawnedList)
+    {
+        foreach (Vector2Int sPos in spawnedList)
+        {
+            if (Vector2.Distance(targetPos, sPos) < minDistanceBetweenFlamethrowers) return true;
+        }
+        return false;
     }
 
     private void SpawnTorches(HashSet<Vector2Int> floorPositions)
@@ -116,25 +201,22 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         if (torchPrefab == null) return;
 
         List<Vector2Int> topWalls = new List<Vector2Int>();
-
-        foreach (Vector2Int pos in floorPositions)
+        foreach (var pos in floorPositions)
         {
             Vector2Int upPos = pos + Vector2Int.up;
-            if (!floorPositions.Contains(upPos))
+            if (!floorPositions.Contains(upPos) && !_occupiedWallPositions.Contains(upPos))
             {
                 topWalls.Add(upPos);
             }
         }
 
         List<Vector2Int> spawnedTorches = new List<Vector2Int>();
-
-        foreach (Vector2Int wallPos in topWalls)
+        foreach (var wallPos in topWalls)
         {
             if (Random.value <= torchSpawnChance)
             {
                 bool isTooClose = false;
-
-                foreach (Vector2Int spawnedPos in spawnedTorches)
+                foreach (var spawnedPos in spawnedTorches)
                 {
                     if (Vector2.Distance(wallPos, spawnedPos) < minDistanceBetweenTorches)
                     {
@@ -148,6 +230,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                     Vector3 spawnPos = new Vector3(wallPos.x + 0.5f, wallPos.y + 0.5f, 0f);
                     Instantiate(torchPrefab, spawnPos, Quaternion.identity, entityParent);
                     spawnedTorches.Add(wallPos);
+                    _occupiedWallPositions.Add(wallPos);
                 }
             }
         }
@@ -172,7 +255,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
         }
 
         bool isFirstRoom = true;
-
         foreach (var room in rooms)
         {
             if (preventSpawnInPlayerRoom && isFirstRoom)
@@ -192,7 +274,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
             List<Vector2Int> safePoints = GetSafeSpawnPoints(room, floor, corridors);
             if (safePoints.Count == 0) continue;
 
-            // 1. Zespawnowanie wyjścia w najdalszym pokoju
             if (room.Equals(furthestRoom) && exitPrefab != null)
             {
                 Vector2Int exitPos = FindBestPositionNearCenter(idealCenter, safePoints);
@@ -200,7 +281,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 safePoints.Remove(exitPos);
             }
 
-            // 2. Zespawnowanie skrzyń
             if (totalChestsSpawned < maxChestsPerDungeon && safePoints.Count > 0)
             {
                 if (Random.value < 0.6f)
@@ -212,11 +292,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 }
             }
 
-            // 3. Zespawnowanie przeciwników
             if (totalEnemiesSpawned < maxEnemiesPerDungeon && safePoints.Count > 0)
             {
                 List<Vector2Int> enemySafePoints = GetPointsAwayFromWall(safePoints, floor, minEnemyDistanceFromWall);
-
                 if (enemySafePoints.Count > 0)
                 {
                     Vector2Int pos = GetAndRemoveRandomPoint(enemySafePoints);
@@ -226,7 +304,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 }
             }
 
-            // 4. LOGIKA SPAWNOWANIA DEKORACJI PODŁOGOWYCH (DODATKOWE OBOSTRZENIA: DYSTANS I UNIKALNOŚĆ)
             if (floorDecorationPrefabs != null && floorDecorationPrefabs.Count > 0 && safePoints.Count > 0)
             {
                 List<Vector2Int> decorSafePoints = GetPointsNearWall(safePoints, floor, maxDecorationsDistanceFromWall);
@@ -236,17 +313,13 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 int maxCount = Mathf.Max(minCount, maxDecorationsPerRoom);
                 int decorationsToSpawn = Random.Range(minCount, maxCount + 1);
 
-                // Lista przechowująca prefaby użyte tylko w TYM konkretnym pokoju
                 HashSet<GameObject> usedPrefabsInThisRoom = new HashSet<GameObject>();
 
                 for (int i = 0; i < decorationsToSpawn; i++)
                 {
                     if (decorSafePoints.Count == 0) break;
 
-                    // Szukamy prefabu, który nie był jeszcze użyty w tym pokoju
                     List<GameObject> availablePrefabs = floorDecorationPrefabs.FindAll(p => !usedPrefabsInThisRoom.Contains(p));
-
-                    // Jeśli wykorzystaliśmy już wszystkie unikalne rodzaje, przerywamy pętlę (warunek: tylko raz w pomieszczeniu)
                     if (availablePrefabs.Count == 0) break;
 
                     int randomDecorIndex = Random.Range(0, availablePrefabs.Count);
@@ -258,14 +331,26 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                         Vector3 spawnPos = new Vector3(decorPos.x + 0.5f, decorPos.y + 0.5f, 0f);
 
                         Instantiate(decorPrefab, spawnPos, Quaternion.identity, entityParent);
-
-                        // Zapisujemy, że ten prefab został już wykorzystany w tym pokoju
                         usedPrefabsInThisRoom.Add(decorPrefab);
 
-                        // Blokujemy kafelki wokół nowej dekoracji w promieniu minDistanceBetweenDecorations (np. 5 kratek)
                         decorSafePoints.RemoveAll(p => Vector2.Distance(decorPos, p) < minDistanceBetweenDecorations);
                         safePoints.Remove(decorPos);
                     }
+                }
+            }
+
+            if (trapPrefab != null && safePoints.Count > 0 && Random.value < trapSpawnChance)
+            {
+                int trapsToSpawn = Random.Range(1, maxTrapsPerRoom + 1);
+                for (int i = 0; i < trapsToSpawn; i++)
+                {
+                    if (safePoints.Count == 0) break;
+
+                    Vector2Int trapPos = GetAndRemoveRandomPoint(safePoints);
+                    Vector3 spawnPos = new Vector3(trapPos.x + 0.5f, trapPos.y + 0.5f, 0f);
+
+                    Instantiate(trapPrefab, spawnPos, Quaternion.identity, entityParent);
+                    safePoints.RemoveAll(p => Vector2.Distance(trapPos, p) < minDistanceBetweenTraps);
                 }
             }
         }
@@ -274,11 +359,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
     private List<Vector2Int> GetPointsNearWall(List<Vector2Int> safePoints, HashSet<Vector2Int> floor, int maxDistance)
     {
         List<Vector2Int> filteredPoints = new List<Vector2Int>();
-
         foreach (Vector2Int pos in safePoints)
         {
             bool isNearWall = false;
-
             for (int x = -maxDistance; x <= maxDistance; x++)
             {
                 for (int y = -maxDistance; y <= maxDistance; y++)
@@ -291,24 +374,17 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 }
                 if (isNearWall) break;
             }
-
-            if (isNearWall)
-            {
-                filteredPoints.Add(pos);
-            }
+            if (isNearWall) filteredPoints.Add(pos);
         }
-
         return filteredPoints;
     }
 
     private List<Vector2Int> GetPointsAwayFromWall(List<Vector2Int> safePoints, HashSet<Vector2Int> floor, int requiredDistance)
     {
         List<Vector2Int> filteredPoints = new List<Vector2Int>();
-
         foreach (Vector2Int pos in safePoints)
         {
             bool isFarEnough = true;
-
             for (int x = -requiredDistance; x <= requiredDistance; x++)
             {
                 for (int y = -requiredDistance; y <= requiredDistance; y++)
@@ -321,13 +397,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkDungeonGenerator
                 }
                 if (!isFarEnough) break;
             }
-
-            if (isFarEnough)
-            {
-                filteredPoints.Add(pos);
-            }
+            if (isFarEnough) filteredPoints.Add(pos);
         }
-
         return filteredPoints;
     }
 
