@@ -3,26 +3,29 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float moveSpeed = 3f;
+    [Header("Movement Settings")]
+    [SerializeField] private float baseMoveSpeed = 3f; // Bazowa prędkość gracza
+    private float moveSpeed;                           // Aktualna prędkość (może być modyfikowana)
+
     private Rigidbody2D rb;
     private Vector2 moveinput;
     private Animator animator;
-
     private SpriteRenderer spriteRenderer;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Na starcie aktualna prędkość to prędkość bazowa
+        moveSpeed = baseMoveSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
         rb.linearVelocity = moveinput * moveSpeed;
         FlipSprite();
-        //CheckDirection();
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -39,19 +42,29 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("InputX", moveinput.x);
         animator.SetFloat("InputY", moveinput.y);
     }
+
     private void FlipSprite()
     {
-        // Je�li warto�� x jest na minusie (idziemy w lewo), w��czamy odwr�cenie
         if (moveinput.x < 0f)
         {
             spriteRenderer.flipX = true;
         }
-        // Je�li warto�� x jest na plusie (idziemy w prawo), wy��czamy odwr�cenie
         else if (moveinput.x > 0f)
         {
             spriteRenderer.flipX = false;
         }
-        // Je�li moveinput.x wynosi 0 (idziemy tylko w g�r�/d� lub stoimy), 
-        // nie robimy nic � posta� zostaje odwr�cona tak, jak ostatnio.
+    }
+
+    // --- NOWE METODY: KONTROLA SPOLWOLNIENIA ---
+    public void ApplySlow(float multiplier)
+    {
+        moveSpeed = baseMoveSpeed * multiplier;
+        Debug.Log($"<color=blue>[RUCH]</color> Nałożono spowolnienie! Szybkość: {moveSpeed}");
+    }
+
+    public void ResetSpeed()
+    {
+        moveSpeed = baseMoveSpeed;
+        Debug.Log($"<color=blue>[RUCH]</color> Prędkość wróciła do normy: {moveSpeed}");
     }
 }
