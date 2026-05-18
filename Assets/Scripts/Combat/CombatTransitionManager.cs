@@ -50,16 +50,24 @@ public class CombatTransitionManager : MonoBehaviour
         _enemy = enemy;
         _dungeonScene = SceneManager.GetActiveScene();
 
-        // Wyłącz WSZYSTKIE EventSystemy i AudioListenery w aktualnych scenach
-        foreach (var es in FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None))
+        // Znajdź EventSystem w scenie lochu
+        _dungeonEventSystem = null;
+        var allES = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None);
+        foreach (var es in allES)
         {
-            es.enabled = false;
+            if (es.gameObject.scene == _dungeonScene)
+            {
+                _dungeonEventSystem = es;
+                break;
+            }
         }
 
-        foreach (var al in FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
-        {
-            al.enabled = false;
-        }
+        if (_dungeonEventSystem != null) _dungeonEventSystem.enabled = false;
+        
+        // AudioListener
+        _dungeonAudioListener = FindFirstObjectByType<AudioListener>();
+        if (_dungeonAudioListener != null && _dungeonAudioListener.gameObject.scene == _dungeonScene)
+            _dungeonAudioListener.enabled = false;
         
         _originalPlayerPos = player.transform.position;
         _originalEnemyPos = enemy.transform.position;

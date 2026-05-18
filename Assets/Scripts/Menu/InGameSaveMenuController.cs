@@ -70,6 +70,7 @@ public class InGameSaveMenuController : MonoBehaviour
         data.attack = _playerManager.Stats.Attack;
         data.defense = _playerManager.Stats.Defense;
         data.gold = _playerManager.Inventory.Gold;
+        data.keys = _playerManager.Inventory.Keys;
 
         // 3. Ekwipunek (ID przedmiotów)
         data.inventoryItemIDs = _playerManager.Inventory.GetItems().Select(i => i.itemID).ToList();

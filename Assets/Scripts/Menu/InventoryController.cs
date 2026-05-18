@@ -13,6 +13,7 @@ public class InventoryController : MonoBehaviour
 
     [Header("Slots")]
     public Transform backpackSlotContainer;
+    public TMPro.TextMeshProUGUI keysText; // <--- DODANE
     public TooltipController tooltipController; // <--- DODANE
     public Slot weaponSlot;
     public Slot helmetSlot;
@@ -91,6 +92,11 @@ public class InventoryController : MonoBehaviour
     {
         RefreshBackpack();
         RefreshEquipment();
+        
+        if (keysText != null && _playerManager != null)
+        {
+            keysText.text = _playerManager.Inventory.Keys.ToString();
+        }
     }
 
     private void RefreshBackpack()

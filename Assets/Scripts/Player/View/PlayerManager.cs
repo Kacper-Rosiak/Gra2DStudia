@@ -68,6 +68,7 @@ public class PlayerManager : MonoBehaviour
         transform.position = data.playerPosition;
         Stats.LoadStats(data.level, data.currentXP, data.currentHP);
         Inventory.AddGold(data.gold);
+        Inventory.AddKeys(data.keys);
 
         if (itemDatabase != null)
         {
