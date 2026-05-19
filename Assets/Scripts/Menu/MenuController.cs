@@ -2,9 +2,25 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
+    private static MenuController _instance;
+
     [Header("Menus")]
     public GameObject inventoryCanvas; // Okno pod klawisz 'I'
     public GameObject systemMenuCanvas; // Okno pod klawisz 'ESC'
+
+    private void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void Start()
     {

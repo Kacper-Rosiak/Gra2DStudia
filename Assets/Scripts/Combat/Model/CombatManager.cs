@@ -10,18 +10,19 @@ public class CombatManager
     public event Action<BattleState> OnStateChanged;
     public event Action<BattleResult> OnBattleEnded;
     public event Action<string> OnCombatLog;
+    public event Action<Entity> OnEnemyTurnReached;
 
-    private List<Entity> _initiativeQueue; // Zmiana na Entity
+    private List<Entity> _initiativeQueue;
     private int _currentTurnIndex;
 
-    public void StartBattle(List<Entity> participants) // Zmiana na Entity
+    public void StartBattle(List<Entity> participants)
     {
         ChangeState(BattleState.Setup);
 
         _initiativeQueue = participants.OrderByDescending(p => p.Speed).ToList();
         _currentTurnIndex = 0;
 
-        OnCombatLog?.Invoke("Starcie si� rozpoczyna!");
+        OnCombatLog?.Invoke("Starcie się rozpoczyna!");
         ProceedToNextTurn();
     }
 
@@ -31,10 +32,9 @@ public class CombatManager
 
         Entity activeEntity = _initiativeQueue[_currentTurnIndex];
 
-        // 1. Aktywacja efekt�w na starcie tury (np. trucizna z klasy Assassin)
+        // 1. Aktywacja efektów na starcie tury
         activeEntity.TriggerTurnStartEffects(log => OnCombatLog?.Invoke(log));
 
-        // Je�li posta� umar�a od efektu (np. poparzenia), przejd� do podsumowania
         if (!activeEntity.IsAlive())
         {
             ChangeState(BattleState.Resolution);
@@ -42,11 +42,11 @@ public class CombatManager
             return;
         }
 
-        // 2. Obs�uga og�uszenia (np. z klasy Warrior)
+        // 2. Obsługa ogłuszenia
         if (activeEntity.IsStunned)
         {
-            OnCombatLog?.Invoke($"{activeEntity.Name} jest og�uszony i traci tur�!");
-            activeEntity.IsStunned = false; // Resetujemy status po pomini�ciu tury
+            OnCombatLog?.Invoke($"{activeEntity.Name} jest ogłuszony i traci turę!");
+            activeEntity.IsStunned = false;
 
             ChangeState(BattleState.Resolution);
             ResolveTurn();
@@ -57,41 +57,11 @@ public class CombatManager
         if (activeEntity.IsPlayer)
         {
             ChangeState(BattleState.PlayerTurn);
-            // Tutaj system czeka. Nic si� nie dzieje, dop�ki Gracz nie kliknie przycisku ataku.
         }
         else
         {
             ChangeState(BattleState.EnemyTurn);
-            // Automatyczny ruch przeciwnika (Sztuczna Inteligencja dla 1v1)
-            ExecuteEnemyTurn(activeEntity);
-        }
-    }
-
-    // --- NOWA METODA: Skrypt tury wroga dla walk 1v1 ---
-    private async void ExecuteEnemyTurn(Entity enemy)
-    {
-        // W walce 1v1 celem jest po prostu jedyny gracz na licie inicjatywy
-        Entity playerTarget = _initiativeQueue.Find(e => e.IsPlayer);
-
-        if (playerTarget != null && playerTarget.IsAlive())
-        {
-            // Opónienie 5 sekund przed ruchem wroga
-            await System.Threading.Tasks.Task.Delay(5000);
-
-            // Sprawdzenie czy walka nadal trwa po odczekaniu
-            if (CurrentState != BattleState.EnemyTurn) return;
-
-            // Tworzymy komend zwykego ataku dla wroga
-            ICombatCommand enemyAttack = new AttackCommand(enemy, playerTarget, log => OnCombatLog?.Invoke($"<color=red>[WROGI ATAK]</color> {log}"));
-
-            // ExecuteTurnAction samo zajmie si wywoaniem komendy i popchniciem kolejki dalej
-            ExecuteTurnAction(enemyAttack);
-        }
-        else
-        {
-            // Zabezpieczenie, gdyby gracza nie byo (np. zgin wczeniej)
-            ChangeState(BattleState.Resolution);
-            ResolveTurn();
+            OnEnemyTurnReached?.Invoke(activeEntity);
         }
     }
 
@@ -139,12 +109,12 @@ public class CombatManager
         Random rnd = new Random();
         if (rnd.Next(0, 100) < successChancePercent)
         {
-            OnCombatLog?.Invoke("Uda�o ci si� uciec z pola walki!");
+            OnCombatLog?.Invoke("Udało ci się uciec z pola walki!");
             EndBattle(BattleResult.Escaped);
         }
         else
         {
-            OnCombatLog?.Invoke("Pr�ba ucieczki nie powiod�a si�! Tracisz tur�.");
+            OnCombatLog?.Invoke("Próba ucieczki nie powiodła się! Tracisz turę.");
             ChangeState(BattleState.Resolution);
             ResolveTurn();
         }
@@ -160,5 +130,10 @@ public class CombatManager
     {
         CurrentState = newState;
         OnStateChanged?.Invoke(CurrentState);
+    }
+
+    public Entity GetPlayerTarget()
+    {
+        return _initiativeQueue.Find(e => e.IsPlayer);
     }
 }

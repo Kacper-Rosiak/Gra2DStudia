@@ -22,10 +22,13 @@ public class PlayerManager : MonoBehaviour
 
     public IAbilityStrategy CurrentAbility { get; private set; }
 
+    [Header("Testing")]
+    public System.Collections.Generic.List<ItemData> startingItems; 
+
     private bool isInCombat = false;
 
     private Coroutine _burnCoroutine;
-    private Coroutine _bleedCoroutine; // <--- NOWOŚĆ: Licznik krwawienia
+    private Coroutine _bleedCoroutine; 
     private Color _originalColor = Color.white;
 
     private void Awake()
@@ -58,6 +61,15 @@ public class PlayerManager : MonoBehaviour
             if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.SelectedPlayerName))
             {
                 playerName = GameManager.Instance.SelectedPlayerName;
+            }
+
+            // DODANIE PRZEDMIOTÓW STARTOWYCH (tylko dla nowej gry)
+            if (startingItems != null)
+            {
+                foreach (var item in startingItems)
+                {
+                    if (item != null) Inventory.AddItem(item);
+                }
             }
         }
     }
@@ -118,18 +130,15 @@ public class PlayerManager : MonoBehaviour
     private void HandleLevelUp(int level) => Debug.Log($"LEVEL UP! {level}");
     private void HandleDeath() => Debug.Log("PLAYER DEAD");
 
-    // METODA OTRZYMYWANIA OBRAŻEŃ Z PEŁNYM LOGOWANIEM DO KONSOLI
     public void TakeDamage(int dmg)
     {
         if (Stats != null)
         {
             Stats.TakeDamage(dmg);
-            // Wyświetla precyzyjny komunikat o otrzymanych obrażeniach
             Debug.Log($"<color=red>[OBRAŻENIA]</color> {playerName} otrzymał <color=yellow>{dmg}</color> pkt obrażeń! Aktualne HP: {Stats.CurrentHP}/{Stats.MaxHP}");
         }
     }
 
-    // --- SYSTEM PODPALENIA (MIOTACZ) ---
     public void ApplyBurning(float duration, int damagePerTick, float tickInterval)
     {
         if (_burnCoroutine != null) StopCoroutine(_burnCoroutine);
@@ -152,10 +161,8 @@ public class PlayerManager : MonoBehaviour
         _burnCoroutine = null;
     }
 
-    // --- NOWOŚĆ: SYSTEM KRWAWIENIA I SPOWOLNIENIA (KOLCE) ---
     public void ApplyBleedAndSlow(float duration, int damagePerTick, float tickInterval, float slowMultiplier)
     {
-        // Resetujemy poprzednie krwawienie, jeśli znowu wejdziemy na kolce
         if (_bleedCoroutine != null) StopCoroutine(_bleedCoroutine);
         _bleedCoroutine = StartCoroutine(BleedAndSlowCoroutine(duration, damagePerTick, tickInterval, slowMultiplier));
     }
@@ -166,14 +173,11 @@ public class PlayerManager : MonoBehaviour
         float damageTimer = 0f;
         bool isRed = false;
 
-        // Pobieramy komponent ruchu i nakładamy spowolnienie
         PlayerMovement movement = GetComponent<PlayerMovement>();
         if (movement != null) movement.ApplySlow(slowMultiplier);
 
-        // Pętla stanu krwawienia
         while (elapsed < duration)
         {
-            // PĘTLA MIGOTANIA: Odwracamy stan co 0.3 sekundy
             isRed = !isRed;
             if (playerSprite != null)
             {
@@ -184,7 +188,6 @@ public class PlayerManager : MonoBehaviour
             elapsed += 0.3f;
             damageTimer += 0.3f;
 
-            // Logika zadawania obrażeń okresowych (DoT) z krwawienia
             if (damageTimer >= tickInterval)
             {
                 TakeDamage(damagePerTick);
@@ -192,7 +195,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        // PRZYWRACANIE STANÓW PO ZAKOŃCZENIU EFEKTU
         if (playerSprite != null) playerSprite.color = _originalColor;
         if (movement != null) movement.ResetSpeed();
 

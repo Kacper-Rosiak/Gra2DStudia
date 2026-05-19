@@ -13,8 +13,8 @@ public class InventoryController : MonoBehaviour
 
     [Header("Slots")]
     public Transform backpackSlotContainer;
-    public TMPro.TextMeshProUGUI keysText; // <--- DODANE
-    public TooltipController tooltipController; // <--- DODANE
+    public TMPro.TextMeshProUGUI keysText; 
+    public TooltipController tooltipController; 
     public Slot weaponSlot;
     public Slot helmetSlot;
     public Slot armorSlot;
@@ -22,60 +22,90 @@ public class InventoryController : MonoBehaviour
     public Slot glovesSlot;
     public Slot bootsSlot;
 
-    [Header("Testing")]
-    public List<ItemData> startingItems; // <--- DODANE DO TESTÓW
+    [Header("Testing (Reference only)")]
+    public List<ItemData> startingItems; 
 
     private PlayerManager _playerManager;
     private List<Slot> _backpackSlots = new List<Slot>();
+    private bool _initialized = false;
 
-    private void Start()
+    private void Awake()
+    {
+        // Przenosimy inicjalizację do Awake, aby sloty były gotowe przed pierwszym OnEnable
+        if (!_initialized)
+        {
+            InitializeBackpackSlots();
+            SetupEquipmentSlots();
+            _initialized = true;
+        }
+    }
+
+    private void OnEnable()
     {
         _playerManager = FindFirstObjectByType<PlayerManager>();
         
         if (_playerManager == null)
         {
-            Debug.LogError("InventoryController: PlayerManager nie znaleziony!");
+            Debug.LogWarning("InventoryController: PlayerManager nie znaleziony w tej scenie!");
             return;
         }
 
-        InitializeBackpackSlots();
-        SetupEquipmentSlots();
-        
-        // DODANIE PRZEDMIOTÓW TESTOWYCH
-        if (startingItems != null)
-        {
-            foreach (var item in startingItems)
-            {
-                if (item != null) _playerManager.Inventory.AddItem(item);
-            }
-        }
-
-        _playerManager.Inventory.OnItemAdded += (item) => RefreshUI();
-        _playerManager.Inventory.OnItemRemoved += (item) => RefreshUI();
+        // Subskrypcja zdarzeń nowego gracza
+        _playerManager.Inventory.OnItemAdded += HandleItemChanged;
+        _playerManager.Inventory.OnItemRemoved += HandleItemChanged;
+        _playerManager.Inventory.OnKeysChanged += HandleKeysChanged; 
         _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
-
+        
         RefreshUI();
     }
 
-    private void OnEnable()
+    private void OnDisable()
     {
-        // Odśwież widok przy każdym otwarciu okna na klawisz "I"
-        if (_playerManager != null) RefreshUI();
+        if (_playerManager != null)
+        {
+            // Odpięcie zdarzeń
+            _playerManager.Inventory.OnItemAdded -= HandleItemChanged;
+            _playerManager.Inventory.OnItemRemoved -= HandleItemChanged;
+            _playerManager.Inventory.OnKeysChanged -= HandleKeysChanged; 
+            _playerManager.Equipment.OnEquipmentChanged -= RefreshUI;
+        }
+    }
+
+    private void HandleItemChanged(ItemData item)
+    {
+        Debug.Log($"[INVENTORY UI] Wykryto zmianę przedmiotu: {item.itemName}. Odświeżam...");
+        RefreshUI();
+    }
+
+    private void HandleKeysChanged(int keys)
+    {
+        Debug.Log($"[INVENTORY UI] Wykryto zmianę kluczy: {keys}. Odświeżam...");
+        RefreshUI();
     }
 
     private void InitializeBackpackSlots()
     {
-        // Czyścimy stare sloty jeśli istnieją
+        if (backpackSlotContainer == null || slotPrefab == null) return;
+
+        // Szukamy gracza tymczasowo tylko po to, by znać pojemność plecaka (domyślnie 24)
+        var pm = FindFirstObjectByType<PlayerManager>();
+        int capacity = pm != null ? pm.inventoryCapacity : 24;
+
+        // Czyścimy stare sloty
         foreach (Transform child in backpackSlotContainer) Destroy(child.gameObject);
         _backpackSlots.Clear();
 
-        int capacity = _playerManager.inventoryCapacity;
         for (int i = 0; i < capacity; i++)
         {
-            Slot slot = Instantiate(slotPrefab, backpackSlotContainer).GetComponent<Slot>();
-            slot.allowedType = null; // Backpack slots allow anything
-            _backpackSlots.Add(slot);
+            GameObject go = Instantiate(slotPrefab, backpackSlotContainer);
+            Slot slot = go.GetComponent<Slot>();
+            if (slot != null)
+            {
+                slot.allowedType = null; 
+                _backpackSlots.Add(slot);
+            }
         }
+        Debug.Log($"[INVENTORY UI] Zainicjalizowano {_backpackSlots.Count} slotów plecaka.");
     }
 
     private void SetupEquipmentSlots()
@@ -90,10 +120,12 @@ public class InventoryController : MonoBehaviour
 
     public void RefreshUI()
     {
+        if (_playerManager == null) return;
+
         RefreshBackpack();
         RefreshEquipment();
         
-        if (keysText != null && _playerManager != null)
+        if (keysText != null)
         {
             keysText.text = _playerManager.Inventory.Keys.ToString();
         }
@@ -101,13 +133,20 @@ public class InventoryController : MonoBehaviour
 
     private void RefreshBackpack()
     {
+        if (_playerManager == null) return;
+
         List<ItemData> items = _playerManager.Inventory.GetItems();
+        
+        // Zabezpieczenie przed brakiem zainicjalizowanych slotów (np. przy DontDestroyOnLoad)
+        if (_backpackSlots.Count == 0) InitializeBackpackSlots();
+
         for (int i = 0; i < _backpackSlots.Count; i++)
         {
             if (i < items.Count)
             {
                 _backpackSlots[i].SetItem(items[i], itemVisualPrefab);
-                _backpackSlots[i].currentItemVisual.GetComponent<ItemView>().Setup(items[i], this, tooltipController);
+                ItemView view = _backpackSlots[i].currentItemVisual.GetComponent<ItemView>();
+                if (view != null) view.Setup(items[i], this, tooltipController);
             }
             else
             {
@@ -118,6 +157,8 @@ public class InventoryController : MonoBehaviour
 
     private void RefreshEquipment()
     {
+        if (_playerManager == null) return;
+
         UpdateEquipmentSlot(weaponSlot, ItemType.Weapon);
         UpdateEquipmentSlot(helmetSlot, ItemType.Helmet);
         UpdateEquipmentSlot(armorSlot, ItemType.Chestplate);
@@ -128,12 +169,13 @@ public class InventoryController : MonoBehaviour
 
     private void UpdateEquipmentSlot(Slot slot, ItemType type)
     {
-        if (slot == null) return;
+        if (slot == null || _playerManager == null) return;
         ItemData item = _playerManager.Equipment.GetEquippedItem(type);
         if (item != null)
         {
             slot.SetItem(item, itemVisualPrefab);
-            slot.currentItemVisual.GetComponent<ItemView>().Setup(item, this, tooltipController);
+            ItemView view = slot.currentItemVisual.GetComponent<ItemView>();
+            if (view != null) view.Setup(item, this, tooltipController);
         }
         else
         {
@@ -150,7 +192,6 @@ public class InventoryController : MonoBehaviour
 
         if (isFromEquipment)
         {
-            // Zdejmij sprzęt
             ItemData unequippedItem = _playerManager.Equipment.UnequipItem(item.type);
             if (unequippedItem != null)
             {
@@ -159,16 +200,13 @@ public class InventoryController : MonoBehaviour
         }
         else
         {
-            // Akcja z plecaka
             if (item.type == ItemType.Potion)
             {
                 _playerManager.Stats.Heal(item.healAmount);
                 _playerManager.Inventory.RemoveItem(item);
-                Debug.Log($"Uleczono o {item.healAmount}. Aktualne HP: {_playerManager.Stats.CurrentHP}");
             }
             else
             {
-                // Załóż zbroję/broń
                 ItemData oldItem = _playerManager.Equipment.EquipItem(item);
                 _playerManager.Inventory.RemoveItem(item);
                 if (oldItem != null)

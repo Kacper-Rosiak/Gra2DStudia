@@ -38794,6 +38794,7 @@ GameObject:
   - component: {fileID: 1317660969}
   - component: {fileID: 1317660968}
   - component: {fileID: 1317660967}
+  - component: {fileID: 1317660970}
   m_Layer: 5
   m_Name: InventoryUI
   m_TagString: Untagged
@@ -38885,6 +38886,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317660965}
   m_CullTransparentMesh: 1
+--- !u!114 &1317660970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317660965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d7f0c40dac7264badb35855852f5bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  backpackPanel: {fileID: 1544392621}
+  equipmentPanel: {fileID: 499888199}
+  slotPrefab: {fileID: 482838095573286800, guid: 572928c6cb69af946bc35f099a53cfb8, type: 3}
+  itemVisualPrefab: {fileID: 950201524042784787, guid: 7bf442da661477f4fadfbdd84fd1dc34, type: 3}
+  backpackSlotContainer: {fileID: 1544392622}
+  keysText: {fileID: 1693625392}
+  tooltipController: {fileID: 2061032486}
+  weaponSlot: {fileID: 123902873}
+  helmetSlot: {fileID: 1482707475}
+  armorSlot: {fileID: 209347840}
+  shieldSlot: {fileID: 643623802}
+  glovesSlot: {fileID: 1175482335}
+  bootsSlot: {fileID: 159716177}
+  startingItems: []
 --- !u!1 &1335892376
 GameObject:
   m_ObjectHideFlags: 0
@@ -64665,7 +64692,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2061032484}
-  - component: {fileID: 2061032483}
   - component: {fileID: 2061032485}
   - component: {fileID: 2061032486}
   m_Layer: 0
@@ -64675,32 +64701,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2061032483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2061032482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7d7f0c40dac7264badb35855852f5bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  backpackPanel: {fileID: 1544392621}
-  equipmentPanel: {fileID: 499888199}
-  slotPrefab: {fileID: 482838095573286800, guid: 572928c6cb69af946bc35f099a53cfb8, type: 3}
-  itemVisualPrefab: {fileID: 950201524042784787, guid: 7bf442da661477f4fadfbdd84fd1dc34, type: 3}
-  backpackSlotContainer: {fileID: 1544392622}
-  keysText: {fileID: 1693625392}
-  tooltipController: {fileID: 2061032486}
-  weaponSlot: {fileID: 123902873}
-  helmetSlot: {fileID: 1482707475}
-  armorSlot: {fileID: 209347840}
-  shieldSlot: {fileID: 643623802}
-  glovesSlot: {fileID: 1175482335}
-  bootsSlot: {fileID: 159716177}
-  startingItems: []
 --- !u!4 &2061032484
 Transform:
   m_ObjectHideFlags: 0

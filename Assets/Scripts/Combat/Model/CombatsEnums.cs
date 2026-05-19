@@ -1,15 +1,15 @@
 // CombatEnums.cs
-// Definicje faz maszyny stanów
+// Definicje faz maszyny stanÃ³w
 public enum BattleState
 {
     Setup,          // Inicjalizacja walki i kolejki
-    PlayerTurn,     // Oczekiwanie na akcjê gracza
+    PlayerTurn,     // Oczekiwanie na akcjÄ™ gracza
     EnemyTurn,      // AI wykonuje ruch
-    Resolution,     // Obliczanie skutków akcji i sprawdzanie czy ktoœ zgin¹³
-    End             // Zakoñczenie walki
+    Resolution,     // Obliczanie skutkÃ³w akcji i sprawdzanie czy ktoÅ› zginÄ…Å‚
+    End             // ZakoÅ„czenie walki
 }
 
-// Mo¿liwe wyniki starcia
+// MoÅ¼liwe wyniki starcia
 public enum BattleResult
 {
     Victory,

@@ -125,6 +125,7 @@ public class CombatController : MonoBehaviour
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
+        _combatManager.OnEnemyTurnReached += (enemy) => StartCoroutine(ExecuteEnemyTurnCoroutine(enemy));
         _combatManager.OnStateChanged += (state) => {
             uiController.UpdateTurnText(state.ToString());
             if (uiController.actionMenu != null)
@@ -246,6 +247,32 @@ public class CombatController : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         ZakonczWalke(won);
+    }
+
+    private System.Collections.IEnumerator ExecuteEnemyTurnCoroutine(Entity enemy)
+    {
+        // 3-sekundowe opóźnienie przed ruchem wroga
+        yield return new WaitForSeconds(3.0f);
+
+
+        // Sprawdzenie czy walka nadal trwa i czy to nadal tura wroga
+        if (_combatManager.CurrentState != BattleState.EnemyTurn) yield break;
+
+        Entity playerTarget = _combatManager.GetPlayerTarget();
+
+        if (playerTarget != null && playerTarget.IsAlive())
+        {
+            // Tworzymy komendę zwykłego ataku dla wroga
+            ICombatCommand enemyAttack = new AttackCommand(enemy, playerTarget, log => uiController.ShowMessage($"<color=red>[WROGI ATAK]</color> {log}"));
+
+            // Wykonujemy akcję
+            _combatManager.ExecuteTurnAction(enemyAttack);
+        }
+        else
+        {
+            // Zabezpieczenie
+            _combatManager.ExecuteTurnAction(new AttackCommand(enemy, null, log => { })); 
+        }
     }
 
     public void OnAttackButtonClicked()
