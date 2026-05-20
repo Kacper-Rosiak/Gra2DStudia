@@ -50,16 +50,24 @@ public class CombatTransitionManager : MonoBehaviour
         _enemy = enemy;
         _dungeonScene = SceneManager.GetActiveScene();
 
-        // Wyłącz WSZYSTKIE EventSystemy i AudioListenery w aktualnych scenach
-        foreach (var es in FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None))
+        // Znajdź EventSystem w scenie lochu
+        _dungeonEventSystem = null;
+        var allES = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None);
+        foreach (var es in allES)
         {
-            es.enabled = false;
+            if (es.gameObject.scene == _dungeonScene)
+            {
+                _dungeonEventSystem = es;
+                break;
+            }
         }
 
-        foreach (var al in FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
-        {
-            al.enabled = false;
-        }
+        if (_dungeonEventSystem != null) _dungeonEventSystem.enabled = false;
+        
+        // AudioListener
+        _dungeonAudioListener = FindFirstObjectByType<AudioListener>();
+        if (_dungeonAudioListener != null && _dungeonAudioListener.gameObject.scene == _dungeonScene)
+            _dungeonAudioListener.enabled = false;
         
         _originalPlayerPos = player.transform.position;
         _originalEnemyPos = enemy.transform.position;
@@ -99,7 +107,9 @@ public class CombatTransitionManager : MonoBehaviour
         player.transform.SetParent(null);
         enemy.transform.SetParent(null);
         
-        SceneManager.MoveGameObjectToScene(player, combatScene);
+        // WAŻNE: Nie używamy MoveGameObjectToScene dla gracza, ponieważ usunęłoby to jego
+        // flagę DontDestroyOnLoad, co doprowadziłoby do jego zniszczenia po wyjściu z lochu.
+        // Gracz w DontDestroyOnLoad jest i tak widoczny we wszystkich scenach.
         SceneManager.MoveGameObjectToScene(enemy, combatScene);
 
         // 5. Ukryj kamerę lochu ZANIM zainicjujesz walkę
@@ -142,8 +152,8 @@ public class CombatTransitionManager : MonoBehaviour
             }
         }
 
-        // 3. Przenieś gracza z powrotem do lochu
-        SceneManager.MoveGameObjectToScene(_player, _dungeonScene);
+        // 3. Przenieś gracza z powrotem na pozycję w lochu
+        // Gracz nigdy nie opuścił DontDestroyOnLoad, wystarczy zmienić pozycję.
         _player.transform.position = _originalPlayerPos;
         _player.transform.localScale = _originalPlayerScale;
         

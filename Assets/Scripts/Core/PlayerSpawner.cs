@@ -22,9 +22,22 @@ public class PlayerSpawner : MonoBehaviour
 
     public GameObject SpawnPlayer()
     {
-        // Jeśli gracz już jest na scenie, zwróć go
+        // 1. Najpierw sprawdźmy, czy mamy już trwałą instancję Singletona (przeszła z innej sceny)
+        if (PlayerManager.Instance != null)
+        {
+            // Przenosimy trwałego gracza na pozycję spawnera w nowej scenie
+            PlayerManager.Instance.transform.position = transform.position;
+            AssignCamera(PlayerManager.Instance.gameObject);
+            return PlayerManager.Instance.gameObject;
+        }
+
+        // 2. Jeśli nie ma instancji, szukamy po tagu (wypadek, gdyby Singleton nie był jeszcze gotowy)
         GameObject existingPlayer = GameObject.FindGameObjectWithTag(playerTag);
-        if (existingPlayer != null) return existingPlayer;
+        if (existingPlayer != null) 
+        {
+            AssignCamera(existingPlayer);
+            return existingPlayer;
+        }
 
         PlayerClassData classToSpawn = null;
 

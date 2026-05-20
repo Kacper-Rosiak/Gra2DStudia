@@ -15,6 +15,7 @@ public class SaveData
     public int attack;
     public int defense;
     public int gold;
+    public int keys;
 
     [Header("Inventory & Equipment")]
     public List<string> inventoryItemIDs = new List<string>();

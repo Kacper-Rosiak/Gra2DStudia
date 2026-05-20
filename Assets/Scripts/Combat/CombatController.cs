@@ -18,6 +18,7 @@ public class CombatController : MonoBehaviour
     // --- ZMIENNE DLA OSIĄGNIĘĆ ---
     private int _initialPlayerHP;
     private bool _playerTookDamageThisCombat = false;
+    private int _accumulatedXP = 0;
 
     private CombatManager _combatManager;
     private Entity _player;
@@ -122,9 +123,16 @@ public class CombatController : MonoBehaviour
         // [ACHIEVEMENT] Zapamiętujemy startowe HP do sprawdzania obrażeń
         _initialPlayerHP = _player.CurrentHP;
         _playerTookDamageThisCombat = false;
+        _accumulatedXP = 0;
+
+        if (_enemy is Enemy enemyModel)
+        {
+            enemyModel.OnEnemyDeath += HandleEnemyDeath;
+        }
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
+        _combatManager.OnEnemyTurnReached += (enemy) => StartCoroutine(ExecuteEnemyTurnCoroutine(enemy));
         _combatManager.OnStateChanged += (state) => {
             uiController.UpdateTurnText(state.ToString());
             if (uiController.actionMenu != null)
@@ -138,9 +146,23 @@ public class CombatController : MonoBehaviour
         _combatManager.StartBattle(new List<Entity> { _player, _enemy });
     }
 
+    private void HandleEnemyDeath(int xpReward)
+    {
+        _accumulatedXP += xpReward;
+    }
+
     private void HandleBattleEnded(BattleResult result)
     {
+        if (_enemy is Enemy enemyModel)
+        {
+            enemyModel.OnEnemyDeath -= HandleEnemyDeath;
+        }
+
         uiController.ShowMessage($"Walka zakończona: {result}");
+
+        string title = result == BattleResult.Victory ? "VICTORY" : 
+                      (result == BattleResult.Defeat ? "DEFEAT" : "Ucieczka");
+        string message = "";
 
         if (result == BattleResult.Victory)
         {
@@ -151,10 +173,53 @@ public class CombatController : MonoBehaviour
             }
 
             CheckAchievementsAtVictory();
+
+            // --- SYSTEM DROPÓW ---
+            CombatDropResult drop = DropManager.GenerateCombatDrop();
+
+            PlayerManager playerManager = _playerObj != null ? _playerObj.GetComponent<PlayerManager>() : PlayerManager.Instance;
+            if (playerManager != null)
+            {
+                if (drop.Gold > 0) playerManager.Inventory.AddGold(drop.Gold);
+                if (drop.Keys > 0) playerManager.Inventory.AddKeys(drop.Keys);
+                playerManager.GainXP(_accumulatedXP);
+                
+                message = $"Łup:\n{drop.Message}\nZdobyto XP: {_accumulatedXP}\nStan XP: {playerManager.Stats.CurrentXP} / {playerManager.Stats.XPToNextLevel}";
+            }
+            else
+            {
+                message = $"Łup:\n{drop.Message}\nZdobyto XP: {_accumulatedXP}";
+            }
+        }
+        else if (result == BattleResult.Defeat)
+        {
+            message = "Nie udało się zdobyć żadnych nagród.";
+        }
+        else
+        {
+            message = "Ucieczka zakończona sukcesem.";
         }
 
         _scalingEnforced = false;
-        StartCoroutine(EndBattleWithDelay(result == BattleResult.Victory));
+
+        // Wyświetlamy popup i czekamy na "OK" przed powrotem
+        if (GenericPopupController.Instance != null)
+        {
+            GenericPopupController.Instance.ShowPopup(title, message, () => ZakonczWalke(result == BattleResult.Victory));
+        }
+        else
+        {
+            Debug.LogWarning("GenericPopupController nie znaleziony! Powrót automatyczny.");
+            StartCoroutine(EndBattleWithDelay(result == BattleResult.Victory));
+        }
+    }
+
+    private void ZakonczWalke(bool won)
+    {
+        if (CombatTransitionManager.Instance != null)
+        {
+            CombatTransitionManager.Instance.EndCombat(won);
+        }
     }
 
     // --- LOGIKA OSIĄGNIĘĆ PRZY ZWYCIĘSTWIE ---
@@ -166,6 +231,15 @@ public class CombatController : MonoBehaviour
         // 2. Sygnał zabicia wroga (dla Pierwsza Krew i Łowca Potworów)
         GameEvents.TriggerEnemyKilled();
 
+        // Dodajemy zabezpieczenie przed brakiem systemu osiągnięć
+        if (AchievementBootstrapper.Instance == null || AchievementBootstrapper.Instance.Achievements == null)
+        {
+            Debug.LogWarning("CombatController: AchievementBootstrapper.Instance lub Achievements jest nullem!");
+            return;
+        }
+
+        var achievements = AchievementBootstrapper.Instance.Achievements;
+
         // 3. Sprawdzenie czy to był Boss (dla Pogromca Bossów)
         if (_enemy is Enemy e && e.IsBoss) // Zakładam, że w klasie Enemy masz pole IsBoss
         {
@@ -174,30 +248,53 @@ public class CombatController : MonoBehaviour
             // [ACHIEVEMENT] Boss Slayer / Mistrz Uników (bez obrażeń)
             if (!_playerTookDamageThisCombat)
             {
-                AchievementBootstrapper.Instance.Achievements.UnlockAchievement("BOSS_NO_DMG");
-                AchievementBootstrapper.Instance.Achievements.UnlockAchievement("EVADE_MASTER");
+                achievements.UnlockAchievement("BOSS_NO_DMG");
+                achievements.UnlockAchievement("EVADE_MASTER");
             }
         }
 
         // 4. [ACHIEVEMENT] Nietykalny (wygrana zwykłej walki bez obrażeń)
         if (!_playerTookDamageThisCombat)
         {
-            AchievementBootstrapper.Instance.Achievements.UnlockAchievement("UNTOUCHABLE");
+            achievements.UnlockAchievement("UNTOUCHABLE");
         }
 
         // 5. [ACHIEVEMENT] Last Pixel (wygrana z dokładnie 1 HP)
         if (_player.CurrentHP == 1)
         {
-            AchievementBootstrapper.Instance.Achievements.UnlockAchievement("LAST_PIXEL");
+            achievements.UnlockAchievement("LAST_PIXEL");
         }
     }
 
     private System.Collections.IEnumerator EndBattleWithDelay(bool won)
     {
         yield return new WaitForSeconds(2f);
-        if (CombatTransitionManager.Instance != null)
+        ZakonczWalke(won);
+    }
+
+    private System.Collections.IEnumerator ExecuteEnemyTurnCoroutine(Entity enemy)
+    {
+        // 3-sekundowe opóźnienie przed ruchem wroga
+        yield return new WaitForSeconds(3.0f);
+
+
+        // Sprawdzenie czy walka nadal trwa i czy to nadal tura wroga
+        if (_combatManager.CurrentState != BattleState.EnemyTurn) yield break;
+
+        Entity playerTarget = _combatManager.GetPlayerTarget();
+
+        if (playerTarget != null && playerTarget.IsAlive())
         {
-            CombatTransitionManager.Instance.EndCombat(won);
+            // Tworzymy komendę zwykłego ataku dla wroga
+            ICombatCommand enemyAttack = new AttackCommand(enemy, playerTarget, log => uiController.ShowMessage($"<color=red>[WROGI ATAK]</color> {log}"));
+
+            // Wykonujemy akcję
+            _combatManager.ExecuteTurnAction(enemyAttack);
+        }
+        else
+        {
+            // Zabezpieczenie
+            _combatManager.ExecuteTurnAction(new AttackCommand(enemy, null, log => { })); 
         }
     }
 

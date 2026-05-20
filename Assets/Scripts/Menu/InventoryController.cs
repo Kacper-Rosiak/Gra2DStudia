@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class InventoryController : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class InventoryController : MonoBehaviour
 
     [Header("Slots")]
     public Transform backpackSlotContainer;
-    public TooltipController tooltipController; // <--- DODANE
+    public TMPro.TextMeshProUGUI keysText; 
+    public TooltipController tooltipController; 
     public Slot weaponSlot;
     public Slot helmetSlot;
     public Slot armorSlot;
@@ -21,59 +23,91 @@ public class InventoryController : MonoBehaviour
     public Slot glovesSlot;
     public Slot bootsSlot;
 
-    [Header("Testing")]
-    public List<ItemData> startingItems; // <--- DODANE DO TESTÓW
-
     private PlayerManager _playerManager;
     private List<Slot> _backpackSlots = new List<Slot>();
+    private bool _initialized = false;
 
-    private void Start()
+    private void Awake()
     {
-        _playerManager = FindFirstObjectByType<PlayerManager>();
-        
-        if (_playerManager == null)
+        if (!_initialized)
         {
-            Debug.LogError("InventoryController: PlayerManager nie znaleziony!");
-            return;
+            InitializeBackpackSlots();
+            SetupEquipmentSlots();
+            _initialized = true;
         }
-
-        InitializeBackpackSlots();
-        SetupEquipmentSlots();
-        
-        // DODANIE PRZEDMIOTÓW TESTOWYCH
-        if (startingItems != null)
-        {
-            foreach (var item in startingItems)
-            {
-                if (item != null) _playerManager.Inventory.AddItem(item);
-            }
-        }
-
-        _playerManager.Inventory.OnItemAdded += (item) => RefreshUI();
-        _playerManager.Inventory.OnItemRemoved += (item) => RefreshUI();
-        _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
-
-        RefreshUI();
     }
 
     private void OnEnable()
     {
-        // Odśwież widok przy każdym otwarciu okna na klawisz "I"
-        if (_playerManager != null) RefreshUI();
+        // Rejestrujemy się na zdarzenie zmiany sceny
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SetupForCurrentScene();
     }
+
+    private void OnDisable()
+    {
+        // Wyrejestrowanie zdarzeń
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnsubscribeFromPlayer();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Wywoływane automatycznie po załadowaniu nowej sceny
+        SetupForCurrentScene();
+    }
+
+    private void SetupForCurrentScene()
+    {
+        UnsubscribeFromPlayer(); 
+        
+        // Zawsze używamy statycznej instancji, która przetrwała zmianę sceny
+        _playerManager = PlayerManager.Instance;
+        
+        if (_playerManager != null)
+        {
+            _playerManager.Inventory.OnItemAdded += HandleItemChanged;
+            _playerManager.Inventory.OnItemRemoved += HandleItemChanged;
+            _playerManager.Inventory.OnKeysChanged += HandleKeysChanged; 
+            _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
+            Debug.Log($"[INVENTORY UI] Pomyślnie podpięto pod instancję gracza: {_playerManager.playerName}");
+        }
+        
+        RefreshUI();
+    }
+
+    private void UnsubscribeFromPlayer()
+    {
+        if (_playerManager != null && _playerManager.Inventory != null)
+        {
+            _playerManager.Inventory.OnItemAdded -= HandleItemChanged;
+            _playerManager.Inventory.OnItemRemoved -= HandleItemChanged;
+            _playerManager.Inventory.OnKeysChanged -= HandleKeysChanged; 
+            _playerManager.Equipment.OnEquipmentChanged -= RefreshUI;
+        }
+    }
+
+    private void HandleItemChanged(ItemData item) => RefreshUI();
+    private void HandleKeysChanged(int keys) => RefreshUI();
 
     private void InitializeBackpackSlots()
     {
-        // Czyścimy stare sloty jeśli istnieją
+        if (backpackSlotContainer == null || slotPrefab == null) return;
+
+        int capacity = _playerManager != null ? _playerManager.inventoryCapacity : 24;
+
         foreach (Transform child in backpackSlotContainer) Destroy(child.gameObject);
         _backpackSlots.Clear();
 
-        int capacity = _playerManager.inventoryCapacity;
         for (int i = 0; i < capacity; i++)
         {
-            Slot slot = Instantiate(slotPrefab, backpackSlotContainer).GetComponent<Slot>();
-            slot.allowedType = null; // Backpack slots allow anything
-            _backpackSlots.Add(slot);
+            GameObject go = Instantiate(slotPrefab, backpackSlotContainer);
+            Slot slot = go.GetComponent<Slot>();
+            if (slot != null)
+            {
+                slot.allowedType = null; 
+                _backpackSlots.Add(slot);
+            }
         }
     }
 
@@ -89,19 +123,36 @@ public class InventoryController : MonoBehaviour
 
     public void RefreshUI()
     {
+        if (_playerManager == null) return;
+
         RefreshBackpack();
         RefreshEquipment();
+        
+        if (keysText != null)
+        {
+            keysText.text = _playerManager.Inventory.Keys.ToString();
+        }
     }
 
     private void RefreshBackpack()
     {
+        if (_playerManager == null || _playerManager.Inventory == null) return;
+
         List<ItemData> items = _playerManager.Inventory.GetItems();
+        // Debug.Log($"[INVENTORY UI] Odświeżanie plecaka. Liczba przedmiotów: {items.Count}");
+
+        if (_backpackSlots.Count == 0) InitializeBackpackSlots();
+
         for (int i = 0; i < _backpackSlots.Count; i++)
         {
             if (i < items.Count)
             {
                 _backpackSlots[i].SetItem(items[i], itemVisualPrefab);
-                _backpackSlots[i].currentItemVisual.GetComponent<ItemView>().Setup(items[i], this, tooltipController);
+                if (_backpackSlots[i].currentItemVisual != null)
+                {
+                    ItemView view = _backpackSlots[i].currentItemVisual.GetComponent<ItemView>();
+                    if (view != null) view.Setup(items[i], this, tooltipController);
+                }
             }
             else
             {
@@ -112,6 +163,8 @@ public class InventoryController : MonoBehaviour
 
     private void RefreshEquipment()
     {
+        if (_playerManager == null) return;
+
         UpdateEquipmentSlot(weaponSlot, ItemType.Weapon);
         UpdateEquipmentSlot(helmetSlot, ItemType.Helmet);
         UpdateEquipmentSlot(armorSlot, ItemType.Chestplate);
@@ -122,12 +175,13 @@ public class InventoryController : MonoBehaviour
 
     private void UpdateEquipmentSlot(Slot slot, ItemType type)
     {
-        if (slot == null) return;
+        if (slot == null || _playerManager == null) return;
         ItemData item = _playerManager.Equipment.GetEquippedItem(type);
         if (item != null)
         {
             slot.SetItem(item, itemVisualPrefab);
-            slot.currentItemVisual.GetComponent<ItemView>().Setup(item, this, tooltipController);
+            ItemView view = slot.currentItemVisual.GetComponent<ItemView>();
+            if (view != null) view.Setup(item, this, tooltipController);
         }
         else
         {
@@ -139,36 +193,25 @@ public class InventoryController : MonoBehaviour
     {
         ItemData item = itemView.GetData();
         Slot slot = itemView.GetComponentInParent<Slot>();
-        
         bool isFromEquipment = slot != null && slot.allowedType != null;
 
         if (isFromEquipment)
         {
-            // Zdejmij sprzęt
             ItemData unequippedItem = _playerManager.Equipment.UnequipItem(item.type);
-            if (unequippedItem != null)
-            {
-                _playerManager.Inventory.AddItem(unequippedItem);
-            }
+            if (unequippedItem != null) _playerManager.Inventory.AddItem(unequippedItem);
         }
         else
         {
-            // Akcja z plecaka
             if (item.type == ItemType.Potion)
             {
                 _playerManager.Stats.Heal(item.healAmount);
                 _playerManager.Inventory.RemoveItem(item);
-                Debug.Log($"Uleczono o {item.healAmount}. Aktualne HP: {_playerManager.Stats.CurrentHP}");
             }
             else
             {
-                // Załóż zbroję/broń
                 ItemData oldItem = _playerManager.Equipment.EquipItem(item);
                 _playerManager.Inventory.RemoveItem(item);
-                if (oldItem != null)
-                {
-                    _playerManager.Inventory.AddItem(oldItem);
-                }
+                if (oldItem != null) _playerManager.Inventory.AddItem(oldItem);
             }
         }
     }
