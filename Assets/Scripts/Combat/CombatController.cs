@@ -18,6 +18,7 @@ public class CombatController : MonoBehaviour
     // --- ZMIENNE DLA OSIĄGNIĘĆ ---
     private int _initialPlayerHP;
     private bool _playerTookDamageThisCombat = false;
+    private int _accumulatedXP = 0;
 
     private CombatManager _combatManager;
     private Entity _player;
@@ -122,6 +123,12 @@ public class CombatController : MonoBehaviour
         // [ACHIEVEMENT] Zapamiętujemy startowe HP do sprawdzania obrażeń
         _initialPlayerHP = _player.CurrentHP;
         _playerTookDamageThisCombat = false;
+        _accumulatedXP = 0;
+
+        if (_enemy is Enemy enemyModel)
+        {
+            enemyModel.OnEnemyDeath += HandleEnemyDeath;
+        }
 
         _combatManager.OnCombatLog += uiController.ShowMessage;
         _combatManager.OnBattleEnded += HandleBattleEnded;
@@ -139,8 +146,18 @@ public class CombatController : MonoBehaviour
         _combatManager.StartBattle(new List<Entity> { _player, _enemy });
     }
 
+    private void HandleEnemyDeath(int xpReward)
+    {
+        _accumulatedXP += xpReward;
+    }
+
     private void HandleBattleEnded(BattleResult result)
     {
+        if (_enemy is Enemy enemyModel)
+        {
+            enemyModel.OnEnemyDeath -= HandleEnemyDeath;
+        }
+
         uiController.ShowMessage($"Walka zakończona: {result}");
 
         string title = result == BattleResult.Victory ? "VICTORY" : 
@@ -159,13 +176,19 @@ public class CombatController : MonoBehaviour
 
             // --- SYSTEM DROPÓW ---
             CombatDropResult drop = DropManager.GenerateCombatDrop();
-            message = $"Łup:\n{drop.Message}";
 
-            PlayerManager playerManager = _playerObj != null ? _playerObj.GetComponent<PlayerManager>() : FindFirstObjectByType<PlayerManager>();
+            PlayerManager playerManager = _playerObj != null ? _playerObj.GetComponent<PlayerManager>() : PlayerManager.Instance;
             if (playerManager != null)
             {
                 if (drop.Gold > 0) playerManager.Inventory.AddGold(drop.Gold);
                 if (drop.Keys > 0) playerManager.Inventory.AddKeys(drop.Keys);
+                playerManager.GainXP(_accumulatedXP);
+                
+                message = $"Łup:\n{drop.Message}\nZdobyto XP: {_accumulatedXP}\nStan XP: {playerManager.Stats.CurrentXP} / {playerManager.Stats.XPToNextLevel}";
+            }
+            else
+            {
+                message = $"Łup:\n{drop.Message}\nZdobyto XP: {_accumulatedXP}";
             }
         }
         else if (result == BattleResult.Defeat)

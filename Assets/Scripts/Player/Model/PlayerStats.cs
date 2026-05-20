@@ -30,6 +30,8 @@ public class PlayerStats
 
     public int Level { get; private set; }
     public int CurrentXP { get; private set; }
+    public int XPToNextLevel => xpToNextLevel;
+    public int PendingStatPoints { get; set; }
 
     private int xpToNextLevel;
 
@@ -84,9 +86,9 @@ public class PlayerStats
     {
         CurrentXP += amount;
 
-        while (CurrentXP >= xpToNextLevel)
+        if (CurrentXP >= xpToNextLevel)
         {
-            CurrentXP -= xpToNextLevel;
+            CurrentXP = 0; // Wyzerowanie XP zgodnie z życzeniem użytkownika
             LevelUp();
         }
     }
@@ -94,11 +96,7 @@ public class PlayerStats
     private void LevelUp()
     {
         Level++;
-
-        // Bazowy przyrost statystyk
-        _baseMaxHP += 10;
-        _baseAttack += 2;
-        _baseDefense += 2;
+        PendingStatPoints++; // Przyznanie punktu statystyk do ręcznego rozdania
 
         CurrentHP = MaxHP;
         xpToNextLevel = CalculateXP();
@@ -113,6 +111,26 @@ public class PlayerStats
         // ---------------------------------
 
         OnLevelUp?.Invoke(Level);
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
+        OnStatsChanged?.Invoke();
+    }
+
+    public void AddBaseAttack(int amount)
+    {
+        _baseAttack += amount;
+        OnStatsChanged?.Invoke();
+    }
+
+    public void AddBaseDefense(int amount)
+    {
+        _baseDefense += amount;
+        OnStatsChanged?.Invoke();
+    }
+
+    public void AddBaseMaxHP(int amount)
+    {
+        _baseMaxHP += amount;
+        CurrentHP += amount; // Leczymy o tyle samo ile dodaliśmy HP
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
         OnStatsChanged?.Invoke();
     }
