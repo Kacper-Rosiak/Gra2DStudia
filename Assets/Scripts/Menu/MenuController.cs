@@ -71,7 +71,7 @@ public class MenuController : MonoBehaviour
         Time.timeScale = isAnyMenuOpen ? 0f : 1f;
         
         // Opcjonalnie: odblokuj kursor myszy jeśli menu jest otwarte
-        Cursor.visible = isAnyMenuOpen;
-        Cursor.lockState = isAnyMenuOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = true; // Zawsze widoczny w grze 2D z UI
+        Cursor.lockState = CursorLockMode.None;
     }
 }

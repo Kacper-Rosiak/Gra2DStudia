@@ -167,7 +167,11 @@ MonoBehaviour:
   playerName: Bohater
   startingClass: {fileID: 11400000, guid: 977fd9326a2bcb741a67be36a6b3a64a, type: 2}
   itemDatabase: {fileID: 11400000, guid: e6cb9ea2afe429b4c921a0732a593c9c, type: 2}
+  playerSprite: {fileID: 0}
   inventoryCapacity: 20
+  startingItems:
+  - {fileID: 11400000, guid: 684dd7a215f567943ac37e8e16592a7a, type: 2}
+  - {fileID: 11400000, guid: 5ef8f77fb0f26b94d86f63a1b70eec33, type: 2}
 --- !u!114 &1437771322647054173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,6 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2a54cb851152824d98cd4d2766b69a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  baseMoveSpeed: 3
 --- !u!114 &6965155633572613618
 MonoBehaviour:
   m_ObjectHideFlags: 0

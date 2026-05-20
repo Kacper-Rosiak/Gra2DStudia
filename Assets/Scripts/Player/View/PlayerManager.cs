@@ -31,18 +31,36 @@ public class PlayerManager : MonoBehaviour
     private Coroutine _bleedCoroutine; 
     private Color _originalColor = Color.white;
 
+    public static PlayerManager Instance { get; private set; }
+
     private void Awake()
     {
-        if (startingClass != null)
+        if (Instance == null)
         {
-            Stats = new PlayerStats(startingClass);
-            Inventory = new Inventory();
-            Equipment = new Equipment(Stats);
-            CurrentAbility = CreateStrategyForClass(startingClass.className);
+            Instance = this;
+            transform.SetParent(null); // Zapewnienie, że obiekt jest w korzeniu (root), aby DontDestroyOnLoad zadziałało
+            DontDestroyOnLoad(gameObject);
+
+            if (startingClass != null)
+            {
+                Stats = new PlayerStats(startingClass);
+                Inventory = new Inventory();
+                Equipment = new Equipment(Stats);
+                CurrentAbility = CreateStrategyForClass(startingClass.className);
+            }
+            else
+            {
+                Debug.LogError("Brak przypisanej klasy postaci w PlayerManager!");
+            }
         }
         else
         {
-            Debug.LogError("Brak przypisanej klasy postaci w PlayerManager!");
+            // Przenosimy trwałego gracza w miejsce, gdzie powinien zacząć w nowej scenie
+            Instance.transform.position = this.transform.position;
+            Instance.transform.rotation = this.transform.rotation;
+            
+            // Usuwamy duplikat z nowej sceny
+            Destroy(gameObject);
         }
     }
 

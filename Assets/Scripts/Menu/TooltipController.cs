@@ -16,14 +16,17 @@ public class TooltipController : MonoBehaviour
 
     private void Awake()
     {
-        _rectTransform = tooltipPanel.GetComponent<RectTransform>();
+        if (tooltipPanel != null)
+        {
+            _rectTransform = tooltipPanel.GetComponent<RectTransform>();
+            HideTooltip();
+        }
         _parentCanvas = GetComponentInParent<Canvas>();
-        HideTooltip();
     }
 
     private void Update()
     {
-        if (tooltipPanel.activeSelf)
+        if (tooltipPanel != null && tooltipPanel.activeSelf)
         {
             UpdatePosition();
         }

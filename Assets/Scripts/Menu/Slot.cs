@@ -15,7 +15,12 @@ public class Slot : MonoBehaviour
         if (item != null && visualPrefab != null)
         {
             currentItemVisual = Instantiate(visualPrefab, transform);
-            currentItemVisual.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            RectTransform rt = currentItemVisual.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.anchoredPosition = Vector2.zero;
+                rt.localScale = Vector3.one;
+            }
         }
     }
 

@@ -14,7 +14,8 @@ public class Chest : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             _playerInRange = true;
-            _playerManager = collision.GetComponent<PlayerManager>();
+            _playerManager = PlayerManager.Instance;
+            if (_playerManager == null) _playerManager = collision.GetComponent<PlayerManager>();
         }
     }
 

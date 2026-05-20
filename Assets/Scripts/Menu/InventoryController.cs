@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class InventoryController : MonoBehaviour
 {
@@ -22,16 +23,12 @@ public class InventoryController : MonoBehaviour
     public Slot glovesSlot;
     public Slot bootsSlot;
 
-    [Header("Testing (Reference only)")]
-    public List<ItemData> startingItems; 
-
     private PlayerManager _playerManager;
     private List<Slot> _backpackSlots = new List<Slot>();
     private bool _initialized = false;
 
     private void Awake()
     {
-        // Przenosimy inicjalizację do Awake, aby sloty były gotowe przed pierwszym OnEnable
         if (!_initialized)
         {
             InitializeBackpackSlots();
@@ -42,28 +39,47 @@ public class InventoryController : MonoBehaviour
 
     private void OnEnable()
     {
-        _playerManager = FindFirstObjectByType<PlayerManager>();
-        
-        if (_playerManager == null)
-        {
-            Debug.LogWarning("InventoryController: PlayerManager nie znaleziony w tej scenie!");
-            return;
-        }
-
-        // Subskrypcja zdarzeń nowego gracza
-        _playerManager.Inventory.OnItemAdded += HandleItemChanged;
-        _playerManager.Inventory.OnItemRemoved += HandleItemChanged;
-        _playerManager.Inventory.OnKeysChanged += HandleKeysChanged; 
-        _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
-        
-        RefreshUI();
+        // Rejestrujemy się na zdarzenie zmiany sceny
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SetupForCurrentScene();
     }
 
     private void OnDisable()
     {
+        // Wyrejestrowanie zdarzeń
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnsubscribeFromPlayer();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Wywoływane automatycznie po załadowaniu nowej sceny
+        SetupForCurrentScene();
+    }
+
+    private void SetupForCurrentScene()
+    {
+        UnsubscribeFromPlayer(); 
+        
+        // Zawsze używamy statycznej instancji, która przetrwała zmianę sceny
+        _playerManager = PlayerManager.Instance;
+        
         if (_playerManager != null)
         {
-            // Odpięcie zdarzeń
+            _playerManager.Inventory.OnItemAdded += HandleItemChanged;
+            _playerManager.Inventory.OnItemRemoved += HandleItemChanged;
+            _playerManager.Inventory.OnKeysChanged += HandleKeysChanged; 
+            _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
+            Debug.Log($"[INVENTORY UI] Pomyślnie podpięto pod instancję gracza: {_playerManager.playerName}");
+        }
+        
+        RefreshUI();
+    }
+
+    private void UnsubscribeFromPlayer()
+    {
+        if (_playerManager != null && _playerManager.Inventory != null)
+        {
             _playerManager.Inventory.OnItemAdded -= HandleItemChanged;
             _playerManager.Inventory.OnItemRemoved -= HandleItemChanged;
             _playerManager.Inventory.OnKeysChanged -= HandleKeysChanged; 
@@ -71,27 +87,15 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    private void HandleItemChanged(ItemData item)
-    {
-        Debug.Log($"[INVENTORY UI] Wykryto zmianę przedmiotu: {item.itemName}. Odświeżam...");
-        RefreshUI();
-    }
-
-    private void HandleKeysChanged(int keys)
-    {
-        Debug.Log($"[INVENTORY UI] Wykryto zmianę kluczy: {keys}. Odświeżam...");
-        RefreshUI();
-    }
+    private void HandleItemChanged(ItemData item) => RefreshUI();
+    private void HandleKeysChanged(int keys) => RefreshUI();
 
     private void InitializeBackpackSlots()
     {
         if (backpackSlotContainer == null || slotPrefab == null) return;
 
-        // Szukamy gracza tymczasowo tylko po to, by znać pojemność plecaka (domyślnie 24)
-        var pm = FindFirstObjectByType<PlayerManager>();
-        int capacity = pm != null ? pm.inventoryCapacity : 24;
+        int capacity = _playerManager != null ? _playerManager.inventoryCapacity : 24;
 
-        // Czyścimy stare sloty
         foreach (Transform child in backpackSlotContainer) Destroy(child.gameObject);
         _backpackSlots.Clear();
 
@@ -105,7 +109,6 @@ public class InventoryController : MonoBehaviour
                 _backpackSlots.Add(slot);
             }
         }
-        Debug.Log($"[INVENTORY UI] Zainicjalizowano {_backpackSlots.Count} slotów plecaka.");
     }
 
     private void SetupEquipmentSlots()
@@ -133,11 +136,11 @@ public class InventoryController : MonoBehaviour
 
     private void RefreshBackpack()
     {
-        if (_playerManager == null) return;
+        if (_playerManager == null || _playerManager.Inventory == null) return;
 
         List<ItemData> items = _playerManager.Inventory.GetItems();
-        
-        // Zabezpieczenie przed brakiem zainicjalizowanych slotów (np. przy DontDestroyOnLoad)
+        // Debug.Log($"[INVENTORY UI] Odświeżanie plecaka. Liczba przedmiotów: {items.Count}");
+
         if (_backpackSlots.Count == 0) InitializeBackpackSlots();
 
         for (int i = 0; i < _backpackSlots.Count; i++)
@@ -145,8 +148,11 @@ public class InventoryController : MonoBehaviour
             if (i < items.Count)
             {
                 _backpackSlots[i].SetItem(items[i], itemVisualPrefab);
-                ItemView view = _backpackSlots[i].currentItemVisual.GetComponent<ItemView>();
-                if (view != null) view.Setup(items[i], this, tooltipController);
+                if (_backpackSlots[i].currentItemVisual != null)
+                {
+                    ItemView view = _backpackSlots[i].currentItemVisual.GetComponent<ItemView>();
+                    if (view != null) view.Setup(items[i], this, tooltipController);
+                }
             }
             else
             {
@@ -187,16 +193,12 @@ public class InventoryController : MonoBehaviour
     {
         ItemData item = itemView.GetData();
         Slot slot = itemView.GetComponentInParent<Slot>();
-        
         bool isFromEquipment = slot != null && slot.allowedType != null;
 
         if (isFromEquipment)
         {
             ItemData unequippedItem = _playerManager.Equipment.UnequipItem(item.type);
-            if (unequippedItem != null)
-            {
-                _playerManager.Inventory.AddItem(unequippedItem);
-            }
+            if (unequippedItem != null) _playerManager.Inventory.AddItem(unequippedItem);
         }
         else
         {
@@ -209,10 +211,7 @@ public class InventoryController : MonoBehaviour
             {
                 ItemData oldItem = _playerManager.Equipment.EquipItem(item);
                 _playerManager.Inventory.RemoveItem(item);
-                if (oldItem != null)
-                {
-                    _playerManager.Inventory.AddItem(oldItem);
-                }
+                if (oldItem != null) _playerManager.Inventory.AddItem(oldItem);
             }
         }
     }
