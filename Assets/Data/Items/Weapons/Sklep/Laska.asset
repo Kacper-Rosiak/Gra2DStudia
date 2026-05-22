@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b2695ada0da4241bdd069c90c1bde9, type: 3}
+  m_Name: Laska
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemID: laska
+  itemName: 
+  description: 
+  icon: {fileID: -788102226925962678, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  type: 3
+  allowedClass: 1
+  price: 0
+  bonusAttack: 7
+  bonusDefense: 0
+  bonusMaxHP: 0
+  healAmount: 0

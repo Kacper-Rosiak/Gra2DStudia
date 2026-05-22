@@ -1,15 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
 
 public class CalySklepController : MonoBehaviour
 {
-    [Header("Ekwipunek Gracza")]
-    // Tutaj wrzucisz pliki ItemData z folderu projektu w Unity, żeby sklep wiedział co daje graczowi!
-    public List<ItemData> przedmiotyWojownika = new List<ItemData>();
-    public List<ItemData> przedmiotyMaga = new List<ItemData>();
-
     [Header("Sklep Wojownika")]
     public GameObject oknoWojownika;
     public TextMeshProUGUI goldTextWojownik;
@@ -18,45 +12,95 @@ public class CalySklepController : MonoBehaviour
     public Button przyciskLuk;
     public Button przyciskTarcza;
 
-    [Header("Sklep Maga")]
+    [Header("Sklep Maga (Przyciski IDEALNIE od góry do dołu)")]
     public GameObject oknoMaga;
     public TextMeshProUGUI goldTextMag;
-    public Button przyciskMikstura;
-    public Button przyciskKostur;
-    public Button przyciskKula;
-    public Button przyciskWidly;
+    public Button magPrzycisk_KosturKosnika; // 1 od góry
+    public Button magPrzycisk_LaskaSekata;   // 2 od góry
+    public Button magPrzycisk_KosturRunow;   // 3 od góry
+    public Button magPrzycisk_EliksirZdrowia; // 4 od góry
+
+    [Header("Bazy Przedmiotow")]
+    public ItemData[] _bazaWojownika = new ItemData[4];
+    public ItemData[] _bazaMaga = new ItemData[4];
 
     private bool _isPlayerNearby = false;
+    private int _zlotoGracza = 300;
     private string _klasaGraczaCache = "Warrior";
-
-    // Referencja do ekwipunku, który aktualnie ma gracz
-    private Inventory _inventoryGracza;
 
     private void Start()
     {
         if (oknoWojownika != null) oknoWojownika.SetActive(false);
         if (oknoMaga != null) oknoMaga.SetActive(false);
 
-        // SZUKANIE EKWIPUNKU: Szukamy w grze komponentu, który trzyma Twój obiekt 'Inventory'
-        // Najczęściej wisi on na obiekcie z Playerem albo GameManagerem.
-        // Zakładam, że masz skrypt typu PlayerController lub InventoryUI, który tworzy "new Inventory()".
-        // Dla testu pobierzemy go z managera lub gracza, ale na ten moment, żeby nie wywaliło błędu,
-        // stworzymy instancję testową, jeśli gra jej nie znajdzie automatycznie:
-        _inventoryGracza = new Inventory(500); // Startowo 500 złota w Twoim systemie Inventory!
+        // PODPIĘCIE PRZYCISKÓW WOJOWNIKA
+        if (przyciskMlot != null) { przyciskMlot.onClick.RemoveAllListeners(); przyciskMlot.onClick.AddListener(() => KupnoZListy(0, true, 60)); }
+        if (przyciskSztylet != null) { przyciskSztylet.onClick.RemoveAllListeners(); przyciskSztylet.onClick.AddListener(() => KupnoZListy(1, true, 80)); }
+        if (przyciskLuk != null) { przyciskLuk.onClick.RemoveAllListeners(); przyciskLuk.onClick.AddListener(() => KupnoZListy(2, true, 95)); }
+        if (przyciskTarcza != null) { przyciskTarcza.onClick.RemoveAllListeners(); przyciskTarcza.onClick.AddListener(() => KupnoZListy(3, true, 50)); }
 
-        // Podpięcie przycisków Wojownika (indeksy 0, 1, 2, 3 z listy)
-        if (przyciskMlot != null) { przyciskMlot.onClick.RemoveAllListeners(); przyciskMlot.onClick.AddListener(() => ProbaZakupu(0, true)); }
-        if (przyciskSztylet != null) { przyciskSztylet.onClick.RemoveAllListeners(); przyciskSztylet.onClick.AddListener(() => ProbaZakupu(1, true)); }
-        if (przyciskLuk != null) { przyciskLuk.onClick.RemoveAllListeners(); przyciskLuk.onClick.AddListener(() => ProbaZakupu(2, true)); }
-        if (przyciskTarcza != null) { przyciskTarcza.onClick.RemoveAllListeners(); przyciskTarcza.onClick.AddListener(() => ProbaZakupu(3, true)); }
+        // =========================================================================
+        // IDEALNA KOLEJNOŚĆ DLA MAGA (SZTYWNE INDEKSY Z BAZY)
+        // =========================================================================
 
-        // Podpięcie przycisków Maga (indeksy 0, 1, 2, 3 z listy)
-        if (przyciskMikstura != null) { przyciskMikstura.onClick.RemoveAllListeners(); przyciskMikstura.onClick.AddListener(() => ProbaZakupu(0, false)); }
-        if (przyciskKostur != null) { przyciskKostur.onClick.RemoveAllListeners(); przyciskKostur.onClick.AddListener(() => ProbaZakupu(1, false)); }
-        if (przyciskKula != null) { przyciskKula.onClick.RemoveAllListeners(); przyciskKula.onClick.AddListener(() => ProbaZakupu(2, false)); }
-        if (przyciskWidly != null) { przyciskWidly.onClick.RemoveAllListeners(); przyciskWidly.onClick.AddListener(() => ProbaZakupu(3, false)); }
+        // 1. Kostur Kośnika -> Zawsze kupuje Element 0 z Bazy Maga, cena 60G
+        if (magPrzycisk_KosturKosnika != null) { magPrzycisk_KosturKosnika.onClick.RemoveAllListeners(); magPrzycisk_KosturKosnika.onClick.AddListener(() => WykonajZakupMaga(0, 60)); }
+
+        // 2. Laska Sękata -> Zawsze kupuje Element 1 z Bazy Maga, cena 80G
+        if (magPrzycisk_LaskaSekata != null) { magPrzycisk_LaskaSekata.onClick.RemoveAllListeners(); magPrzycisk_LaskaSekata.onClick.AddListener(() => WykonajZakupMaga(1, 80)); }
+
+        // 3. Kostur Runów -> Zawsze kupuje Element 2 z Bazy Maga, cena 95G
+        if (magPrzycisk_KosturRunow != null) { magPrzycisk_KosturRunow.onClick.RemoveAllListeners(); magPrzycisk_KosturRunow.onClick.AddListener(() => WykonajZakupMaga(2, 95)); }
+
+        // 4. Eliksir Zdrowia -> Zawsze kupuje Element 3 z Bazy Maga, cena 50G
+        if (magPrzycisk_EliksirZdrowia != null) { magPrzycisk_EliksirZdrowia.onClick.RemoveAllListeners(); magPrzycisk_EliksirZdrowia.onClick.AddListener(() => WykonajZakupMaga(3, 50)); }
 
         AktualizujZlotoUI();
+    }
+
+    private void WykonajZakupMaga(int indeks, int cena)
+    {
+        if (_bazaMaga == null || indeks >= _bazaMaga.Length || _bazaMaga[indeks] == null)
+        {
+            Debug.LogError($"[SKLEP] Brak przypisanego przedmiotu w Baza Maga pod Elementem {indeks}!");
+            return;
+        }
+
+        if (_zlotoGracza >= cena)
+        {
+            PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
+            if (realPlayerManager != null && realPlayerManager.Inventory != null)
+            {
+                _zlotoGracza -= cena;
+                realPlayerManager.Inventory.AddItem(_bazaMaga[indeks]);
+                AktualizujZlotoUI();
+                Debug.Log($"[SKLEP SUKCES] Kupiono dla Maga: {_bazaMaga[indeks].name}. Zostało konta: {_zlotoGracza}G");
+            }
+            else
+            {
+                Debug.LogError("[SKLEP ERROR] Nie znaleziono skryptu plecaka gracza na scenie!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"[SKLEP] Brak kasy na: {_bazaMaga[indeks].name}! Koszt: {cena}G");
+        }
+    }
+
+    private void KupnoZListy(int indeks, bool czyWojownik, int cena)
+    {
+        if (_bazaWojownika == null || indeks >= _bazaWojownika.Length || _bazaWojownika[indeks] == null) return;
+
+        if (_zlotoGracza >= cena)
+        {
+            PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
+            if (realPlayerManager != null && realPlayerManager.Inventory != null)
+            {
+                _zlotoGracza -= cena;
+                realPlayerManager.Inventory.AddItem(_bazaWojownika[indeks]);
+                AktualizujZlotoUI();
+            }
+        }
     }
 
     private void Update()
@@ -65,78 +109,47 @@ public class CalySklepController : MonoBehaviour
         {
             if ((oknoWojownika != null && oknoWojownika.activeSelf) || (oknoMaga != null && oknoMaga.activeSelf))
             {
-                ZamknijSklepy();
+                if (oknoWojownika != null) oknoWojownika.SetActive(false);
+                if (oknoMaga != null) oknoMaga.SetActive(false);
             }
             else
             {
-                OtworzSklepDlaKlasy();
+                PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
+                if (realPlayerManager != null && realPlayerManager.startingClass != null)
+                {
+                    _klasaGraczaCache = realPlayerManager.startingClass.className;
+                }
+                else
+                {
+                    _klasaGraczaCache = "Mage";
+                }
+
+                AktualizujZlotoUI();
+
+                if (_klasaGraczaCache == "Warrior" && oknoWojownika != null) oknoWojownika.SetActive(true);
+                if (_klasaGraczaCache == "Mage" && oknoMaga != null) oknoMaga.SetActive(true);
+
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
         }
-    }
 
-    private void OtworzSklepDlaKlasy()
-    {
-        AktualizujZlotoUI();
-        if (_klasaGraczaCache == "Warrior" && oknoWojownika != null) oknoWojownika.SetActive(true);
-        if (_klasaGraczaCache == "Mage" && oknoMaga != null) oknoMaga.SetActive(true);
-    }
-
-    private void ZamknijSklepy()
-    {
-        if (oknoWojownika != null) oknoWojownika.SetActive(false);
-        if (oknoMaga != null) oknoMaga.SetActive(false);
-    }
-
-    private void ProbaZakupu(int indeksPrzedmiotu, bool czyWojownik)
-    {
-        List<ItemData> listaDoKupna = czyWojownik ? przedmiotyWojownika : przedmiotyMaga;
-
-        // Bezpiecznik: Czy w ogóle wrzuciłeś ten przedmiot do listy w Inspektorze?
-        if (indeksPrzedmiotu >= listaDoKupna.Count || listaDoKupna[indeksPrzedmiotu] == null)
+        if ((oknoWojownika != null && oknoWojownika.activeSelf) || (oknoMaga != null && oknoMaga.activeSelf))
         {
-            Debug.LogError($"[SKLEP] Brak przypisanego pliku ItemData dla slotu {indeksPrzedmiotu}!");
-            return;
-        }
-
-        ItemData wybranyPrzedmiot = listaDoKupna[indeksPrzedmiotu];
-
-        // Zakładamy sztywne ceny tak jak były na tablicach: 50, 60, 80, 95
-        int[] ceny = { 50, 60, 80, 95 };
-        int cena = ceny[Mathf.Clamp(indeksPrzedmiotu, 0, 3)];
-
-        // UŻYWAMY TWOJEJ FUNKCJI Z INVENTORY: TrySpendGold sama sprawdzi kasę i ją odejmie!
-        if (_inventoryGracza != null && _inventoryGracza.TrySpendGold(cena))
-        {
-            // UŻYWAMY TWOJEJ FUNKCJI Z INVENTORY: Dodajemy fizyczny obiekt do plecaka!
-            _inventoryGracza.AddItem(wybranyPrzedmiot);
-
-            AktualizujZlotoUI();
-            Debug.Log($"[SKLEP DODANO!] Kupiono: {wybranyPrzedmiot.name} i dodano do Twojego Inventory!");
-        }
-        else
-        {
-            Debug.LogError($"[SKLEP] Za mało kasy w Twoim Inventory! Koszt: {cena}, masz: {_inventoryGracza?.Gold}");
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 
-    private void AktualizujZlotoUI()
+    public void AktualizujZlotoUI()
     {
-        if (_inventoryGracza == null) return;
-
-        // Pobieramy złoto bezpośrednio z Twojego systemu Inventory!
-        if (goldTextWojownik != null) goldTextWojownik.text = _inventoryGracza.Gold + "G";
-        if (goldTextMag != null) goldTextMag.text = _inventoryGracza.Gold + "G";
+        if (goldTextWojownik != null) goldTextWojownik.text = _zlotoGracza + "G";
+        if (goldTextMag != null) goldTextMag.text = _zlotoGracza + "G";
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
-        {
-            _isPlayerNearby = true;
-
-            // Tutaj możesz zmienić na "Mage" żeby sprawdzić sklep maga
-            _klasaGraczaCache = "Warrior";
-        }
+        if (collision.CompareTag("Player")) _isPlayerNearby = true;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -144,7 +157,8 @@ public class CalySklepController : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             _isPlayerNearby = false;
-            ZamknijSklepy();
+            if (oknoWojownika != null) oknoWojownika.SetActive(false);
+            if (oknoMaga != null) oknoMaga.SetActive(false);
         }
     }
 }

@@ -38971,7 +38971,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.00744839, y: 0.0017487854}
+  m_Offset: {x: 0.000032402575, y: 0.0017487854}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -38981,7 +38981,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.24523678, y: 0.33464995}
+  m_Size: {x: 0.2304049, y: 0.33464995}
   m_EdgeRadius: 0
 --- !u!50 &1497602719
 Rigidbody2D:
@@ -39077,13 +39077,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1497602716}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.36, y: -0.6025, z: 0}
+  m_LocalRotation: {x: 0.09865939, y: -0, z: -0, w: 0.99512124}
+  m_LocalPosition: {x: -16.36, y: -0.6024999, z: -0.00000022501818}
   m_LocalScale: {x: 5, y: 4.7964997, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 11.324, y: 0, z: 0}
 --- !u!114 &1497602722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39096,15 +39096,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 845872a334c66144ea08cbd6dc8c31c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopManager
-  shopView: {fileID: 0}
-  itemsForSale:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  npcShopClass: 0
-  _isPlayerNearby: 0
-  _playerGoldCache: 550
 --- !u!114 &1497602723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39119,16 +39110,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CalySklepController
   oknoWojownika: {fileID: 1115686140}
   goldTextWojownik: {fileID: 705177835}
-  przyciskMlot: {fileID: 500581920}
-  przyciskSztylet: {fileID: 0}
-  przyciskLuk: {fileID: 0}
-  przyciskTarcza: {fileID: 0}
+  przyciskMlot: {fileID: 1484976305}
+  przyciskSztylet: {fileID: 866568532}
+  przyciskLuk: {fileID: 500581920}
+  przyciskTarcza: {fileID: 816142262}
   oknoMaga: {fileID: 1967878820}
   goldTextMag: {fileID: 249535651}
-  przyciskMikstura: {fileID: 702530133}
-  przyciskKostur: {fileID: 912078910}
-  przyciskKula: {fileID: 1352222163}
-  przyciskWidly: {fileID: 584184313}
+  magPrzycisk_KosturKosnika: {fileID: 584184313}
+  magPrzycisk_LaskaSekata: {fileID: 1352222163}
+  magPrzycisk_KosturRunow: {fileID: 912078910}
+  magPrzycisk_EliksirZdrowia: {fileID: 702530133}
+  _bazaWojownika:
+  - {fileID: 11400000, guid: ab507b889da2948499f5002e006775e2, type: 2}
+  - {fileID: 11400000, guid: 459252ed5b6e73b42b988a6538ddc9c9, type: 2}
+  - {fileID: 11400000, guid: 87c105158c1b855488f24374c9eb1652, type: 2}
+  - {fileID: 11400000, guid: 3dcfc7c4d9f290843bd374edce7b1b92, type: 2}
+  _bazaMaga:
+  - {fileID: 11400000, guid: 3dc113adff17f37428119168b8b8a04a, type: 2}
+  - {fileID: 11400000, guid: ef4a167ebd117d74e9ccd892339160ea, type: 2}
+  - {fileID: 11400000, guid: 54f44e605758a50409fa0e1556a5ccaa, type: 2}
+  - {fileID: 11400000, guid: b502b1f015c131d40ae3a42d2face943, type: 2}
 --- !u!1 &1501505452
 GameObject:
   m_ObjectHideFlags: 0
