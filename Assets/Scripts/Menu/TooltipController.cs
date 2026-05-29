@@ -21,6 +21,10 @@ public class TooltipController : MonoBehaviour
             _rectTransform = tooltipPanel.GetComponent<RectTransform>();
             HideTooltip();
         }
+        else
+        {
+            Debug.LogError("[TooltipController] 'tooltipPanel' is not assigned in the Inspector!", this);
+        }
         _parentCanvas = GetComponentInParent<Canvas>();
     }
 
@@ -34,6 +38,8 @@ public class TooltipController : MonoBehaviour
 
     private void UpdatePosition()
     {
+        if (_rectTransform == null) return;
+
         Vector3 mousePos = Input.mousePosition;
         
         float tooltipWidth = _rectTransform.rect.width;
@@ -59,9 +65,14 @@ public class TooltipController : MonoBehaviour
     public void ShowTooltip(ItemData item)
     {
         if (item == null) return;
+        if (tooltipPanel == null)
+        {
+            Debug.LogWarning("[TooltipController] Cannot show tooltip: 'tooltipPanel' is missing.");
+            return;
+        }
 
-        itemNameText.text = item.itemName;
-        itemDescriptionText.text = item.description;
+        if (itemNameText != null) itemNameText.text = item.itemName;
+        if (itemDescriptionText != null) itemDescriptionText.text = item.description;
 
         StringBuilder sb = new StringBuilder();
         if (item.type == ItemType.Potion)
@@ -75,16 +86,20 @@ public class TooltipController : MonoBehaviour
             if (item.bonusMaxHP > 0) sb.AppendLine($"Maks. HP: +{item.bonusMaxHP}");
         }
 
-        itemStatsText.text = sb.ToString();
+        if (itemStatsText != null) itemStatsText.text = sb.ToString();
         
         tooltipPanel.SetActive(true);
 
         // Wymuszenie natychmiastowego przeliczenia rozmiaru tła
-        LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+        if (_rectTransform != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
     }
 
     public void HideTooltip()
     {
-        tooltipPanel.SetActive(false);
+        if (tooltipPanel != null)
+        {
+            tooltipPanel.SetActive(false);
+        }
     }
 }
