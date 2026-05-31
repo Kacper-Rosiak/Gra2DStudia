@@ -39114,7 +39114,7 @@ MonoBehaviour:
   itemVisualPrefab: {fileID: 950201524042784787, guid: 7bf442da661477f4fadfbdd84fd1dc34, type: 3}
   backpackSlotContainer: {fileID: 1544392622}
   keysText: {fileID: 1693625392}
-  tooltipController: {fileID: 2061032486}
+  tooltipController: {fileID: 0}
   weaponSlot: {fileID: 123902873}
   helmetSlot: {fileID: 1482707475}
   armorSlot: {fileID: 209347840}
@@ -39271,6 +39271,7 @@ GameObject:
   - component: {fileID: 1353482501}
   - component: {fileID: 1353482500}
   - component: {fileID: 1353482504}
+  - component: {fileID: 1353482505}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -39379,6 +39380,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MenuController
   inventoryCanvas: {fileID: 1317660965}
   systemMenuCanvas: {fileID: 1562878336}
+--- !u!114 &1353482505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353482499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac2b01c8bdc59924da23616a37307652, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TooltipController
+  tooltipPanel: {fileID: 1252376732}
+  itemNameText: {fileID: 1976501637}
+  itemStatsText: {fileID: 92372722}
+  itemDescriptionText: {fileID: 136388835}
 --- !u!1 &1400992290
 GameObject:
   m_ObjectHideFlags: 0
@@ -65061,7 +65078,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2061032484}
   - component: {fileID: 2061032485}
-  - component: {fileID: 2061032486}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -65096,22 +65112,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f70b12ff355e13548881f7d97996146f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
---- !u!114 &2061032486
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2061032482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac2b01c8bdc59924da23616a37307652, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TooltipController
-  tooltipPanel: {fileID: 1252376732}
-  itemNameText: {fileID: 1976501637}
-  itemStatsText: {fileID: 92372722}
-  itemDescriptionText: {fileID: 136388835}
 --- !u!1 &2066138762
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,8 @@ using System.Text;
 
 public class TooltipController : MonoBehaviour
 {
+    public static TooltipController Instance { get; private set; }
+
     [Header("UI References")]
     public GameObject tooltipPanel;
     public TextMeshProUGUI itemNameText;
@@ -16,6 +18,16 @@ public class TooltipController : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         if (tooltipPanel != null)
         {
             _rectTransform = tooltipPanel.GetComponent<RectTransform>();
