@@ -8,7 +8,15 @@ public class PlayerStats
     public event Action OnDeath;
     public event Action OnStatsChanged;
 
+    // --- NOWY EVENT: Żeby UI sklepu albo HUD wiedziały, że zmieniła się ilość kasy ---
+    public event Action<int> OnGoldChanged;
+    // ---------------------------------------------------------------------------------
+
     public int CurrentHP { get; private set; }
+
+    // --- NOWA WŁAŚCIWOŚĆ: Portfel gracza ---
+    public int Zloto { get; private set; }
+    // ---------------------------------------
 
     // Base stats (from level/class)
     private int _baseMaxHP;
@@ -47,8 +55,61 @@ public class PlayerStats
         Level = 1;
         CurrentXP = 0;
 
+        // --- NOWOŚĆ: Startujesz z zerem złota (lub zmień na ile chcesz) ---
+        Zloto = 0;
+        // ------------------------------------------------------------------
+
         xpToNextLevel = CalculateXP();
+
+        // --- NOWOŚĆ: Podpinamy portfel pod system misji przy narodzinach statystyk ---
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.OnQuestProgressChanged += SprawdzNagrodeZaMisje;
+        }
     }
+
+    // --- NOWA METODA: Automatyczne odbieranie złota po ukończeniu misji ---
+    private void SprawdzNagrodeZaMisje(QuestData misja)
+    {
+        if (misja == null || misja.objectives == null) return;
+
+        bool czyWszystkoUkonczone = true;
+        foreach (var cel in misja.objectives)
+        {
+            if (cel.currentAmount < cel.targetAmount)
+            {
+                czyWszystkoUkonczone = false;
+                break;
+            }
+        }
+
+        // Jeśli misja została właśnie wbita na 100%, dodaj złoto jako nagrodę!
+        if (czyWszystkoUkonczone)
+        {
+            AddGold(misja.rewardGold);
+            Debug.Log($"<color=gold>[PORTFEL]</color> Nagroda za misję '{misja.questName}' odebrana! +{misja.rewardGold}G.");
+        }
+    }
+
+    public void AddGold(int amount)
+    {
+        Zloto += amount;
+        OnGoldChanged?.Invoke(Zloto);
+        OnStatsChanged?.Invoke();
+    }
+
+    public bool SpendGold(int amount)
+    {
+        if (Zloto >= amount)
+        {
+            Zloto -= amount;
+            OnGoldChanged?.Invoke(Zloto);
+            OnStatsChanged?.Invoke();
+            return true; // Zakupy udane
+        }
+        return false; // Za biedny jesteś
+    }
+    // ----------------------------------------------------------------------
 
     public void UpdateEquipmentBonuses(int attack, int defense, int maxHP)
     {
@@ -88,7 +149,7 @@ public class PlayerStats
 
         if (CurrentXP >= xpToNextLevel)
         {
-            CurrentXP = 0; // Wyzerowanie XP zgodnie z życzeniem użytkownika
+            CurrentXP = 0;
             LevelUp();
         }
     }
@@ -96,19 +157,16 @@ public class PlayerStats
     private void LevelUp()
     {
         Level++;
-        PendingStatPoints++; // Przyznanie punktu statystyk do ręcznego rozdania
+        PendingStatPoints++;
 
         CurrentHP = MaxHP;
         xpToNextLevel = CalculateXP();
 
-        // --- WYWOŁANIE TWOJEGO POP-UPA ---
-        // Ponieważ ta klasa nie jest MonoBehaviour, używamy pełnej ścieżki do silnika Unity
         var triggers = UnityEngine.Object.FindFirstObjectByType<GameAchievementTriggers>();
         if (triggers != null)
         {
             triggers.TriggerLevelUp();
         }
-        // ---------------------------------
 
         OnLevelUp?.Invoke(Level);
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
@@ -130,7 +188,7 @@ public class PlayerStats
     public void AddBaseMaxHP(int amount)
     {
         _baseMaxHP += amount;
-        CurrentHP += amount; // Leczymy o tyle samo ile dodaliśmy HP
+        CurrentHP += amount;
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
         OnStatsChanged?.Invoke();
     }
@@ -139,16 +197,14 @@ public class PlayerStats
     {
         Level = level;
         CurrentXP = xp;
-        
-        // Recalculate base stats based on level
-        // Assuming 10 HP, 2 Attack, 2 Defense per level (starting from lvl 1)
+
         int levelsGained = Level - 1;
         _baseMaxHP += levelsGained * 10;
         _baseAttack += levelsGained * 2;
         _baseDefense += levelsGained * 2;
-        
+
         xpToNextLevel = CalculateXP();
-        
+
         CurrentHP = hp;
         if (CurrentHP > MaxHP) CurrentHP = MaxHP;
 
