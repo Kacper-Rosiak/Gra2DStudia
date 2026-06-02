@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class PlayerManager : MonoBehaviour
@@ -146,7 +147,12 @@ public class PlayerManager : MonoBehaviour
 
     public Player GetCombatEntity(string playerName) => new Player(playerName, Stats, CurrentAbility);
     private void HandleLevelUp(int level) => Debug.Log($"LEVEL UP! {level}");
-    private void HandleDeath() => Debug.Log("PLAYER DEAD");
+    private void HandleDeath()
+    {
+        Debug.Log("PLAYER DEAD");
+        GameEvents.TriggerPlayerDeath();
+        SceneManager.LoadScene("EndGame");
+    }
 
     public void TakeDamage(int dmg)
     {

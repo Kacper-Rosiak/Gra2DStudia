@@ -64,6 +64,23 @@ public class InventoryController : MonoBehaviour
         // Zawsze używamy statycznej instancji, która przetrwała zmianę sceny
         _playerManager = PlayerManager.Instance;
         
+        // Próba znalezienia TooltipController w nowej scenie, jeśli obecny jest nieważny (zniszczony po zmianie sceny)
+        if (tooltipController == null)
+        {
+            tooltipController = TooltipController.Instance;
+            
+            // Jeśli singleton jeszcze nie zaskoczył, szukamy w scenie
+            if (tooltipController == null)
+            {
+                tooltipController = FindFirstObjectByType<TooltipController>();
+            }
+
+            if (tooltipController != null)
+            {
+                Debug.Log("[INVENTORY UI] TooltipController został ponownie podpięty.");
+            }
+        }
+
         if (_playerManager != null)
         {
             _playerManager.Inventory.OnItemAdded += HandleItemChanged;

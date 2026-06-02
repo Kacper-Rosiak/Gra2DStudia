@@ -23,9 +23,9 @@ public class CombatUIController : MonoBehaviour
         player.OnHealthChanged += (curr, max) => StartCoroutine(AnimateBar(playerSlider, curr, max));
         enemy.OnHealthChanged += (curr, max) => StartCoroutine(AnimateBar(enemySlider, curr, max));
 
-        // Ustawiamy paski na pełne przy starcie
-        playerSlider.value = 1;
-        enemySlider.value = 1;
+        // Ustawiamy paski na aktualne wartości przy starcie
+        if (playerSlider != null) playerSlider.value = (float)player.CurrentHP / player.MaxHP;
+        if (enemySlider != null) enemySlider.value = (float)enemy.CurrentHP / enemy.MaxHP;
 
         // Na starcie ukrywamy menu (CombatController je włączy w turze gracza)
         if (actionMenu != null) actionMenu.SetActive(false);
