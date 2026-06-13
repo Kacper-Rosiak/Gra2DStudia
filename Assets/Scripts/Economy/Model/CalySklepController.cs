@@ -25,7 +25,6 @@ public class CalySklepController : MonoBehaviour
     public ItemData[] _bazaMaga = new ItemData[4];
 
     private bool _isPlayerNearby = false;
-    private int _zlotoGracza = 300;
     private string _klasaGraczaCache = "Warrior";
 
     private void Start()
@@ -66,24 +65,29 @@ public class CalySklepController : MonoBehaviour
             return;
         }
 
-        if (_zlotoGracza >= cena)
+        PlayerManager realPlayerManager = PlayerManager.Instance;
+        if (realPlayerManager != null && realPlayerManager.Inventory != null)
         {
-            PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
-            if (realPlayerManager != null && realPlayerManager.Inventory != null)
+            if (realPlayerManager.Inventory.TrySpendGold(cena))
             {
-                _zlotoGracza -= cena;
                 realPlayerManager.Inventory.AddItem(_bazaMaga[indeks]);
                 AktualizujZlotoUI();
-                Debug.Log($"[SKLEP SUKCES] Kupiono dla Maga: {_bazaMaga[indeks].name}. Zostało konta: {_zlotoGracza}G");
+                Debug.Log($"[SKLEP SUKCES] Kupiono dla Maga: {_bazaMaga[indeks].name}. Zostało konta: {realPlayerManager.Inventory.Gold}G");
+
+                // POWIADOMIENIE SYSTEMU MISJI
+                if (QuestManager.Instance != null)
+                {
+                    QuestManager.Instance.ZwiekszPostepCelu("Kup dowolny przedmiot u handlarza");
+                }
             }
             else
             {
-                Debug.LogError("[SKLEP ERROR] Nie znaleziono skryptu plecaka gracza na scenie!");
+                Debug.LogError($"[SKLEP] Brak kasy na: {_bazaMaga[indeks].name}! Koszt: {cena}G");
             }
         }
         else
         {
-            Debug.LogError($"[SKLEP] Brak kasy na: {_bazaMaga[indeks].name}! Koszt: {cena}G");
+            Debug.LogError("[SKLEP ERROR] Nie znaleziono skryptu plecaka gracza!");
         }
     }
 
@@ -91,12 +95,11 @@ public class CalySklepController : MonoBehaviour
     {
         if (_bazaWojownika == null || indeks >= _bazaWojownika.Length || _bazaWojownika[indeks] == null) return;
 
-        if (_zlotoGracza >= cena)
+        PlayerManager realPlayerManager = PlayerManager.Instance;
+        if (realPlayerManager != null && realPlayerManager.Inventory != null)
         {
-            PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
-            if (realPlayerManager != null && realPlayerManager.Inventory != null)
+            if (realPlayerManager.Inventory.TrySpendGold(cena))
             {
-                _zlotoGracza -= cena;
                 realPlayerManager.Inventory.AddItem(_bazaWojownika[indeks]);
                 AktualizujZlotoUI();
             }
@@ -114,7 +117,7 @@ public class CalySklepController : MonoBehaviour
             }
             else
             {
-                PlayerManager realPlayerManager = FindFirstObjectByType<PlayerManager>();
+                PlayerManager realPlayerManager = PlayerManager.Instance;
                 if (realPlayerManager != null && realPlayerManager.startingClass != null)
                 {
                     _klasaGraczaCache = realPlayerManager.startingClass.className;
@@ -143,11 +146,20 @@ public class CalySklepController : MonoBehaviour
 
     public void AktualizujZlotoUI()
     {
-        if (goldTextWojownik != null) goldTextWojownik.text = _zlotoGracza + "G";
-        if (goldTextMag != null) goldTextMag.text = _zlotoGracza + "G";
+        if (PlayerManager.Instance != null && PlayerManager.Instance.Inventory != null)
+        {
+            int zloto = PlayerManager.Instance.Inventory.Gold;
+            if (goldTextWojownik != null) goldTextWojownik.text = zloto + "G";
+            if (goldTextMag != null) goldTextMag.text = zloto + "G";
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player")) _isPlayerNearby = true;
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.CompareTag("Player")) _isPlayerNearby = true;
     }

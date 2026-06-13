@@ -18,6 +18,15 @@ public class PlayerSpawner : MonoBehaviour
     {
         // Spawnuje gracza na starcie, jeśli jeszcze go nie ma
         SpawnPlayer();
+
+        // POWIADOMIENIE SYSTEMU MISJI (Eksploracja lochów)
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "DungeonScene")
+        {
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.ZwiekszPostepCelu("Przeszukaj zapomniane lochy");
+            }
+        }
     }
 
     public GameObject SpawnPlayer()
