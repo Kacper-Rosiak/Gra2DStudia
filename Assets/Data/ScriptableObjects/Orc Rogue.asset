@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Orc Rogue
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Orc Rogue
-  maxHP: 40
-  attack: 8
-  defense: 4
-  speed: 5
-  xpReward: 15
+  maxHP: 65
+  attack: 18
+  defense: 6
+  speed: 11
+  isBoss: 0
+  xpReward: 20

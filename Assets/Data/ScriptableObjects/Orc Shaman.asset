@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Orc Shaman
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Orc Shaman
-  maxHP: 35
-  attack: 17
-  defense: 2
+  maxHP: 55
+  attack: 28
+  defense: 4
   speed: 10
+  isBoss: 0
   xpReward: 35
