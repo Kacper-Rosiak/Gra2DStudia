@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: magic_02
   itemName: "Drewniana Laska z Kryszta\u0142em"
   description: Na bogato
-  icon: {fileID: -1657285672376761777, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  icon: {fileID: -898126551, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 3
+  allowedClass: 0
+  price: 0
   bonusAttack: 15
   bonusDefense: 0
   bonusMaxHP: 0

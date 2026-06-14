@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: boneWeapon_01
   itemName: "Wid\u0142y Maga"
   description: 'Palce Utopca '
-  icon: {fileID: 5711116462528912062, guid: 936f60ca0a44d99458f64de31ca3a153, type: 3}
+  icon: {fileID: -339950090, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 3
+  allowedClass: 0
+  price: 0
   bonusAttack: 32
   bonusDefense: 0
   bonusMaxHP: 0
