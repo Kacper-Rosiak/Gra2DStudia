@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: shield_01
   itemName: "Ma\u0142a Drewniana Tarcza"
   description: Z 3 ciosy obroni
-  icon: {fileID: 2086297571032007841, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  icon: {fileID: 181855300, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 4
+  allowedClass: 0
+  price: 0
   bonusAttack: 0
   bonusDefense: 3
   bonusMaxHP: 2

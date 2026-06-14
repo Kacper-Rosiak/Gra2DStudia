@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: kosa_01
   itemName: Drewniana Kosa
   description: "To chyba sie tylko do zbo\u017Ca nadaje"
-  icon: {fileID: 7034648377202862406, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  icon: {fileID: -1558104736, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 3
+  allowedClass: 0
+  price: 0
   bonusAttack: 4
   bonusDefense: 0
   bonusMaxHP: 0

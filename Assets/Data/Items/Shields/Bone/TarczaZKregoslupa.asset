@@ -17,6 +17,8 @@ MonoBehaviour:
   description: "Ko\u015Bciotrup p\u0142aka\u0142 jak oddawa\u0142"
   icon: {fileID: -4225111264100749204, guid: 936f60ca0a44d99458f64de31ca3a153, type: 3}
   type: 4
+  allowedClass: 0
+  price: 0
   bonusAttack: 0
   bonusDefense: 25
   bonusMaxHP: 15

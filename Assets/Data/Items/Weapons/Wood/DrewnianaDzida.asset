@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: weapon_01
   itemName: "W\u0142\xF3cznia"
   description: Ostra jak nie wiem co
-  icon: {fileID: -8620212288190494280, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  icon: {fileID: 2128782198, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 3
+  allowedClass: 0
+  price: 0
   bonusAttack: 8
   bonusDefense: 0
   bonusMaxHP: 0

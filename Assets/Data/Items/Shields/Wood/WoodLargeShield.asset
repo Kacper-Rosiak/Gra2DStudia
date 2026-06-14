@@ -15,8 +15,10 @@ MonoBehaviour:
   itemID: shield_02
   itemName: "Du\u017Ca drewniana tarcza"
   description: "Du\u017Ca jak ..."
-  icon: {fileID: 766917867214973812, guid: 3fbd28965e23e7f47b3f7bf7403f7f4c, type: 3}
+  icon: {fileID: -1875304844, guid: d3be52dd230f4e54880d474e347e13a9, type: 3}
   type: 4
+  allowedClass: 0
+  price: 0
   bonusAttack: 0
   bonusDefense: 12
   bonusMaxHP: 0
