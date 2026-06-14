@@ -14,7 +14,7 @@ public static class DropManager
         int roll = Random.Range(0, 100);
         CombatDropResult result = new CombatDropResult();
 
-        if (roll < 10) // 70% chance for gold
+        if (roll < 70) // 70% chance for gold
         {
             result.Gold = Random.Range(5, 41); // 5 to 40 inclusive
             result.Keys = 0;

@@ -19,6 +19,7 @@ public class CombatController : MonoBehaviour
     private int _initialPlayerHP;
     private bool _playerTookDamageThisCombat = false;
     private int _accumulatedXP = 0;
+    private int _playerMovesCount = 0;
 
     private CombatManager _combatManager;
     private Entity _player;
@@ -174,6 +175,23 @@ public class CombatController : MonoBehaviour
 
             CheckAchievementsAtVictory();
 
+            // --- POWIADOMIENIA SYSTEMU MISJI ---
+            if (QuestManager.Instance != null)
+            {
+                // 1. Zabij zielonoskórych (Goblina lub Orka)
+                string enemyName = _enemy != null ? _enemy.Name.ToLower() : "";
+                if (enemyName.Contains("goblin") || enemyName.Contains("orc"))
+                {
+                    QuestManager.Instance.ZwiekszPostepCelu("Zabij gobliny w okolicy");
+                }
+
+                // 2. Błyskawiczna egzekucja (mniej niż 3 ruchy)
+                if (_playerMovesCount < 3)
+                {
+                    QuestManager.Instance.ZwiekszPostepCelu("Zabij przeciwnika w mniej niż 3 ruchach");
+                }
+            }
+
             // --- SYSTEM DROPÓW ---
             CombatDropResult drop = DropManager.GenerateCombatDrop();
 
@@ -301,6 +319,7 @@ public class CombatController : MonoBehaviour
     public void OnAttackButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
+        _playerMovesCount++;
         ICombatCommand attack = new AttackCommand(_player, _enemy, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
         _combatManager.ExecuteTurnAction(attack);
     }
@@ -312,6 +331,7 @@ public class CombatController : MonoBehaviour
 
         if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
         {
+            _playerMovesCount++;
             ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
             _combatManager.ExecuteTurnAction(special);
 
@@ -327,6 +347,7 @@ public class CombatController : MonoBehaviour
     public void OnDefendButtonClicked()
     {
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
+        _playerMovesCount++;
         ICombatCommand defend = new DefendCommand(_player, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
         _combatManager.ExecuteTurnAction(defend);
     }

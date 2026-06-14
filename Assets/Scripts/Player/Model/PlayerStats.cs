@@ -86,20 +86,40 @@ public class PlayerStats
         // Jeśli misja została właśnie wbita na 100%, dodaj złoto jako nagrodę!
         if (czyWszystkoUkonczone)
         {
-            AddGold(misja.rewardGold);
-            Debug.Log($"<color=gold>[PORTFEL]</color> Nagroda za misję '{misja.questName}' odebrana! +{misja.rewardGold}G.");
+            if (PlayerManager.Instance != null && PlayerManager.Instance.Inventory != null)
+            {
+                PlayerManager.Instance.Inventory.AddGold(misja.rewardGold);
+                Debug.Log($"<color=gold>[PORTFEL]</color> Nagroda za misję '{misja.questName}' odebrana! +{misja.rewardGold}G.");
+            }
+            else
+            {
+                // Fallback do starego systemu jeśli Inventory nie istnieje
+                AddGold(misja.rewardGold);
+            }
         }
     }
 
     public void AddGold(int amount)
     {
-        Zloto += amount;
-        OnGoldChanged?.Invoke(Zloto);
-        OnStatsChanged?.Invoke();
+        if (PlayerManager.Instance != null && PlayerManager.Instance.Inventory != null)
+        {
+            PlayerManager.Instance.Inventory.AddGold(amount);
+        }
+        else
+        {
+            Zloto += amount;
+            OnGoldChanged?.Invoke(Zloto);
+            OnStatsChanged?.Invoke();
+        }
     }
 
     public bool SpendGold(int amount)
     {
+        if (PlayerManager.Instance != null && PlayerManager.Instance.Inventory != null)
+        {
+            return PlayerManager.Instance.Inventory.TrySpendGold(amount);
+        }
+
         if (Zloto >= amount)
         {
             Zloto -= amount;
@@ -171,6 +191,12 @@ public class PlayerStats
         OnLevelUp?.Invoke(Level);
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
         OnStatsChanged?.Invoke();
+
+        // POWIADOMIENIE SYSTEMU MISJI
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ZwiekszPostepCelu("Zdobądź 5 poziom doświadczenia");
+        }
     }
 
     public void AddBaseAttack(int amount)

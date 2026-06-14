@@ -26,6 +26,7 @@ public class PlayerManager : MonoBehaviour
     [Header("Testing")]
     public System.Collections.Generic.List<ItemData> startingItems; 
 
+    public bool IsInCombat => isInCombat;
     private bool isInCombat = false;
 
     private Coroutine _burnCoroutine;

@@ -77,6 +77,12 @@ public class Chest : MonoBehaviour
             message = $"Znaleziono przedmiot o jakości {chestRarity}:\n\n{lootedItem.itemName}";
             _playerManager.Inventory.AddItem(lootedItem);
             Debug.Log($"<color=green>[CHEST]</color> Sukces! Przedmiot {lootedItem.itemName} został dodany do listy przedmiotów.");
+
+            // POWIADOMIENIE SYSTEMU MISJI
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.ZwiekszPostepCelu("Przeszukaj ukryte skrzynie ze złotem");
+            }
         }
         else
         {

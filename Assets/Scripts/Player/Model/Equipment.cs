@@ -23,6 +23,13 @@ public class Equipment
 
         _equippedItems[item.type] = item;
         UpdateStats();
+        
+        // POWIADOMIENIE SYSTEMU MISJI
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ZwiekszPostepCelu("Załóż lepsze uzbrojenie w ekwipunku");
+        }
+
         OnEquipmentChanged?.Invoke();
         return oldItem;
     }

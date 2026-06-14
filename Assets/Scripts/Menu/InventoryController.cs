@@ -15,6 +15,7 @@ public class InventoryController : MonoBehaviour
     [Header("Slots")]
     public Transform backpackSlotContainer;
     public TMPro.TextMeshProUGUI keysText; 
+    public TMPro.TextMeshProUGUI goldText;
     public TooltipController tooltipController; 
     public Slot weaponSlot;
     public Slot helmetSlot;
@@ -86,6 +87,7 @@ public class InventoryController : MonoBehaviour
             _playerManager.Inventory.OnItemAdded += HandleItemChanged;
             _playerManager.Inventory.OnItemRemoved += HandleItemChanged;
             _playerManager.Inventory.OnKeysChanged += HandleKeysChanged; 
+            _playerManager.Inventory.OnGoldChanged += HandleGoldChanged;
             _playerManager.Equipment.OnEquipmentChanged += RefreshUI;
             Debug.Log($"[INVENTORY UI] Pomyślnie podpięto pod instancję gracza: {_playerManager.playerName}");
         }
@@ -100,12 +102,14 @@ public class InventoryController : MonoBehaviour
             _playerManager.Inventory.OnItemAdded -= HandleItemChanged;
             _playerManager.Inventory.OnItemRemoved -= HandleItemChanged;
             _playerManager.Inventory.OnKeysChanged -= HandleKeysChanged; 
+            _playerManager.Inventory.OnGoldChanged -= HandleGoldChanged;
             _playerManager.Equipment.OnEquipmentChanged -= RefreshUI;
         }
     }
 
     private void HandleItemChanged(ItemData item) => RefreshUI();
     private void HandleKeysChanged(int keys) => RefreshUI();
+    private void HandleGoldChanged(int gold) => RefreshUI();
 
     private void InitializeBackpackSlots()
     {
@@ -148,6 +152,11 @@ public class InventoryController : MonoBehaviour
         if (keysText != null)
         {
             keysText.text = _playerManager.Inventory.Keys.ToString();
+        }
+
+        if (goldText != null)
+        {
+            goldText.text = _playerManager.Inventory.Gold.ToString();
         }
     }
 
@@ -223,6 +232,12 @@ public class InventoryController : MonoBehaviour
             {
                 _playerManager.Stats.Heal(item.healAmount);
                 _playerManager.Inventory.RemoveItem(item);
+
+                // POWIADOMIENIE SYSTEMU MISJI (tylko w walce)
+                if (_playerManager.IsInCombat && QuestManager.Instance != null)
+                {
+                    QuestManager.Instance.ZwiekszPostepCelu("Użyj mikstury leczącej podczas walki");
+                }
             }
             else
             {
