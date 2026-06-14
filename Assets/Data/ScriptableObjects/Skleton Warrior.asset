@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Skleton Warrior
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Skleton Warrior
-  maxHP: 15
-  attack: 2
-  defense: 0
-  speed: 10
-  xpReward: 15
+  maxHP: 120
+  attack: 22
+  defense: 14
+  speed: 4
+  isBoss: 0
+  xpReward: 35

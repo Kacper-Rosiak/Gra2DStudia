@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Skieleton
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Skeleton
-  maxHP: 70
-  attack: 12
-  defense: 6
-  speed: 3
-  xpReward: 30
+  maxHP: 85
+  attack: 20
+  defense: 8
+  speed: 6
+  isBoss: 0
+  xpReward: 40
