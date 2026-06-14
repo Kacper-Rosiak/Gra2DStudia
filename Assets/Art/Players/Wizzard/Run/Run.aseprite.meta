@@ -102,7 +102,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 639169699124088138
+  platformSettingsDirtyTick: 639170367096591507
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -129,8 +129,8 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Frame_0
     originalName: 
-    pivot: {x: 0.5, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -150,8 +150,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: Frame_1
     originalName: 
-    pivot: {x: 0.52, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -171,8 +171,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 46}
   - name: Frame_2
     originalName: 
-    pivot: {x: 0.52, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -192,8 +192,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 89}
   - name: Frame_3
     originalName: 
-    pivot: {x: 0.52, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -213,8 +213,8 @@ ScriptedImporter:
     uvTransform: {x: 38, y: 90}
   - name: Frame_4
     originalName: 
-    pivot: {x: 0.52, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -234,8 +234,8 @@ ScriptedImporter:
     uvTransform: {x: 38, y: 4}
   - name: Frame_5
     originalName: 
-    pivot: {x: 0.52, y: 0}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
