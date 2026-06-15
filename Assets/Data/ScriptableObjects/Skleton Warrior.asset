@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Skleton Warrior
   maxHP: 120
-  attack: 22
+  attack: 40
   defense: 14
   speed: 4
   isBoss: 0

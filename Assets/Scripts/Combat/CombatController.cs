@@ -20,6 +20,7 @@ public class CombatController : MonoBehaviour
     private bool _playerTookDamageThisCombat = false;
     private int _accumulatedXP = 0;
     private int _playerMovesCount = 0;
+    private bool _specialUsed = false;
 
     private CombatManager _combatManager;
     private Entity _player;
@@ -125,6 +126,8 @@ public class CombatController : MonoBehaviour
         _initialPlayerHP = _player.CurrentHP;
         _playerTookDamageThisCombat = false;
         _accumulatedXP = 0;
+        _specialUsed = false;
+        uiController.SetSpecialAbilityButtonInteractable(true);
 
         if (_enemy is Enemy enemyModel)
         {
@@ -329,9 +332,17 @@ public class CombatController : MonoBehaviour
         if (_combatManager == null || _combatManager.CurrentState != BattleState.PlayerTurn) return;
         if (_player == null || _enemy == null) return;
 
+        if (_specialUsed)
+        {
+            uiController.ShowMessage("<color=orange>[INFO]</color> Możesz użyć umiejętności specjalnej tylko raz na walkę!");
+            return;
+        }
+
         if (_player is Player playerInstance && playerInstance.SpecialAbility != null)
         {
             _playerMovesCount++;
+            _specialUsed = true;
+            uiController.SetSpecialAbilityButtonInteractable(false);
             ICombatCommand special = new UseAbilityCommand(_player, _enemy, playerInstance.SpecialAbility, message => uiController.ShowMessage($"<color=green>[Akcja gracza]</color> {message}"));
             _combatManager.ExecuteTurnAction(special);
 
