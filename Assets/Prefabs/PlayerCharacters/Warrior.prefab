@@ -86,7 +86,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1701584443341091289, guid: 2c29c3b8fcc2a2a4f9a0eb7a7e8e65ed, type: 3}
+  m_Sprite: {fileID: 6555932551172750971, guid: 2028d38b8b3c7724ebc3fa9ebb4d23c0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -159,7 +159,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
   playerName: Bohater
   startingClass: {fileID: 11400000, guid: 63c54c4e05360f24e9afd4ca9f5b7d53, type: 2}
+  itemDatabase: {fileID: 0}
+  playerSprite: {fileID: 0}
   inventoryCapacity: 20
+  startingItems: []
 --- !u!114 &1946221294929079387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,3 +317,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2a54cb851152824d98cd4d2766b69a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  baseMoveSpeed: 3

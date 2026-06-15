@@ -2856,6 +2856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatUIController
   actionMenu: {fileID: 852391263}
+  specialAttackButton: {fileID: 446660873}
   playerSlider: {fileID: 1885409279}
   enemySlider: {fileID: 1019808205}
   turnText: {fileID: 839237453}

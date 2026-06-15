@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Orc Rogue
   maxHP: 65
-  attack: 18
+  attack: 70
   defense: 6
   speed: 11
   isBoss: 0

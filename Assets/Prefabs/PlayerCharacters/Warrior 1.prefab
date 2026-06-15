@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.01168, y: 1.03269, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SortingLayer: 5
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1701584443341091289, guid: 2c29c3b8fcc2a2a4f9a0eb7a7e8e65ed, type: 3}
+  m_Sprite: {fileID: 6555932551172750971, guid: 2028d38b8b3c7724ebc3fa9ebb4d23c0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -161,7 +161,9 @@ MonoBehaviour:
   playerName: Bohater
   startingClass: {fileID: 11400000, guid: 63c54c4e05360f24e9afd4ca9f5b7d53, type: 2}
   itemDatabase: {fileID: 11400000, guid: e6cb9ea2afe429b4c921a0732a593c9c, type: 2}
+  playerSprite: {fileID: 0}
   inventoryCapacity: 24
+  startingItems: []
 --- !u!114 &2461522275269266963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,6 +318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2a54cb851152824d98cd4d2766b69a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  baseMoveSpeed: 3
 --- !u!61 &5302535194805960413
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -353,8 +356,8 @@ BoxCollider2D:
   m_Offset: {x: -0.0003977418, y: -0.001497522}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.21, y: 0.29}
+    pivot: {x: 0.57894737, y: 0}
+    oldSize: {x: 1.1875, y: 1.8125}
     newSize: {x: 0.21, y: 0.3}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

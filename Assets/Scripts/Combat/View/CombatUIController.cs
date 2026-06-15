@@ -6,8 +6,8 @@ using System.Collections;
 public class CombatUIController : MonoBehaviour
 {
     [Header("Menu Akcji")]
-    // To jest to brakujące ogniwo, o które prosił CombatController
     public GameObject actionMenu;
+    public Button specialAttackButton;
 
     [Header("Paski HP")]
     public Slider playerSlider;
@@ -51,4 +51,12 @@ public class CombatUIController : MonoBehaviour
     // Metody wywoływane przez Managera do aktualizacji UI
     public void UpdateTurnText(string status) => turnText.text = "Status: " + status;
     public void ShowMessage(string message) => combatLogText.text = message;
+
+    public void SetSpecialAbilityButtonInteractable(bool interactable)
+    {
+        if (specialAttackButton != null)
+        {
+            specialAttackButton.interactable = interactable;
+        }
+    }
 }
