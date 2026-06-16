@@ -136,6 +136,17 @@ public class CombatTransitionManager : MonoBehaviour
         StartCoroutine(EndCombatRoutine(playerWon));
     }
 
+    /// <summary>
+    /// Forcefully resets the combat state. Useful when combat is interrupted 
+    /// (e.g. by player death) and normal cleanup is bypassed.
+    /// </summary>
+    public void ResetState()
+    {
+        _isCombatActive = false;
+        StopAllCoroutines();
+        Debug.Log("CombatTransitionManager: State reset forcefully.");
+    }
+
     private IEnumerator EndCombatRoutine(bool playerWon)
     {
         // 1. Fade Out

@@ -34,6 +34,16 @@ public class EndGameController : MonoBehaviour
         {
             Destroy(PlayerManager.Instance.gameObject);
         }
+
+        if (CombatTransitionManager.Instance != null)
+        {
+            CombatTransitionManager.Instance.ResetState();
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            Destroy(QuestManager.Instance.gameObject);
+        }
         
         // Opcjonalnie: upewniamy się, że SaveManager nie ma załadowanych danych, 
         // które mogłyby wpłynąć na nową grę.

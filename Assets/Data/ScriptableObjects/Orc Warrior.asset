@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyId: Orc Warrior
   maxHP: 120
-  attack: 60
+  attack: 50
   defense: 12
   speed: 5
   isBoss: 0

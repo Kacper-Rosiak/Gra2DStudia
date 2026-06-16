@@ -49,6 +49,11 @@ public class MainMenuController : MonoBehaviour
 
     void OnNewGameClick()
     {
+        // Cleanup persistent singletons to ensure a fresh state
+        if (PlayerManager.Instance != null) Destroy(PlayerManager.Instance.gameObject);
+        if (CombatTransitionManager.Instance != null) CombatTransitionManager.Instance.ResetState();
+        if (QuestManager.Instance != null) Destroy(QuestManager.Instance.gameObject);
+        
         saveManager.InitializeNewGame();
         SceneManager.LoadSceneAsync(1);
     }
